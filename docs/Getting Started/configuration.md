@@ -7,10 +7,9 @@ sidebar_position: 2
 
 Dewy will read env vars from an `.env` file if provided. You can also set these directly in the environment, for example when configuring an instance running in docker / kubernetes.
 
-```sh
-# ~/.env
+```sh title="~/.env"
 ENVIRONMENT=LOCAL
-DB=postgresql://...
+DB=postgresql://dewydbuser:dewydbpwd@localhost/dewydb
 OPENAI_API_KEY=...
 ```
 
