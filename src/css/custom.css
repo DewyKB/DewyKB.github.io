@@ -4,10 +4,13 @@
  * work well for content-centric websites.
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Arvo&display=swap');
+
 /* You can override the default Infima variables here. */
 :root {
   --ifm-code-font-size: 95%;
   --ifm-footer-background-color: white;
+  --ifm-heading-font-family: 'Arvo', sans-serif;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
