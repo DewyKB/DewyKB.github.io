@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Dewy',
   tagline: 'The Knowledgebase for AI',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   // Set the production url of your site here
   url: 'https://DewyKB.github.io',
@@ -61,7 +61,7 @@ const config: Config = {
       title: 'Dewy',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/logo.png',
+        src: 'img/logo.svg',
       },
       items: [
         {
