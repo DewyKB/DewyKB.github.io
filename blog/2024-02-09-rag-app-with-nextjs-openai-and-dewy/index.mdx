@@ -73,7 +73,7 @@ export const runtime = 'edge'
 
 // Create a Dewy client
 const dewy = new Dewy({
-    endpoint: process.env.DEWY_ENDPOINT
+    BASE: process.env.DEWY_ENDPOINT
 })
 
 export async function POST(req: Request) {
@@ -105,7 +105,7 @@ Dewy takes care of downloading the document, extracting information from it and 
         apiKey: process.env.OPENAI_API_KEY
     })
     const dewy = new Dewy({
-        endpoint: process.env.DEWY_ENDPOINT
+        BASE: process.env.DEWY_ENDPOINT
     })
 
     export async function generate({query}) {
