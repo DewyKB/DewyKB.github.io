@@ -38,7 +38,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/DewyKB/dewy/tree/main/',
+            'https://github.com/DewyKB/DewyKB.github.io/tree/main/',
         },
         blog: {
           showReadingTime: true,
