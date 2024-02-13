@@ -43,10 +43,8 @@ function Feature({title, Svg, description}: FeatureItem) {
       <div className="text--center">
         {Svg}
       </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
-      </div>
+      <Heading as="h3" className="text--center">{title}</Heading>
+      <p className="padding-horiz--md">{description}</p>
     </div>
   );
 }
