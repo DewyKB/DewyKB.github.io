@@ -14,7 +14,7 @@ import TabItem from '@theme/TabItem';
 <Tabs groupId="language">
     <TabItem value="typescript" label="typescript" default>
     ```sh
-    npm install dewy_ts
+    npm install dewy-ts
     ```
     </TabItem>
     <TabItem value="python" label="python">
@@ -29,7 +29,7 @@ import TabItem from '@theme/TabItem';
 <Tabs groupId="language">
     <TabItem value="typescript">
     ```typescript
-    import { Dewy } from 'dewy_ts';
+    import { Dewy } from 'dewy-ts';
     const dewy = new Dewy()
     ```
     </TabItem>

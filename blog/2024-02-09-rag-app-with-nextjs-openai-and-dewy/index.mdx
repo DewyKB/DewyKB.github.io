@@ -76,7 +76,7 @@ The final code is available [as an example](https://github.com/DewyKB/dewy-ts/tr
 1. **Install required packages:** Install client libraries for the OpenAI API and Dewy. 
 
     ```
-    npm install openai dewy_ts ai
+    npm install openai dewy-ts ai
     ```
 
 1. **Prepare environment variables**: Set up environment variables for the OpenAI API key and your Dewy instance. Create a `.env.local` file in the root of your NextJS project and add the following lines:
@@ -89,7 +89,7 @@ The final code is available [as an example](https://github.com/DewyKB/dewy-ts/tr
 ### Step 2: Create an API endpoint to add documents
 
 ```tsx title="app/api/documents/route.ts"
-import { Dewy } from 'dewy_ts';
+import { Dewy } from 'dewy-ts';
 
 export const runtime = 'edge'
 
@@ -120,7 +120,7 @@ Dewy takes care of downloading the document, extracting information from it and 
 1. **Create a generation function**: This function will take the user's query and the retrieved documents from Dewy, and send a request to the OpenAI API to generate a response. The key is to format the prompt to include relevant information from the retrieved documents.
     ```tsx title="app/api/chat/utils.tsx"
     import OpenAI from 'openai';
-    import { Dewy } from 'dewy_ts'; 
+    import { Dewy } from 'dewy-ts'; 
 
     // Create Dewy and OpenAI clients
     const openai = new OpenAI({
