@@ -37,8 +37,8 @@ import TabItem from '@theme/TabItem';
 
 ## Add documents
     ```typescript
-    await dewy.default.addDocument({
-      collection_id: 1,
+    await dewy.kb.addDocument({
+      collection: "main",
       url: 'https://arxiv.org/abs/2005.11401',
     })
     ```
@@ -48,8 +48,8 @@ import TabItem from '@theme/TabItem';
 <Tabs groupId="language">
     <TabItem value="typescript">
     ```typescript
-    const context = await dewy.default.retrieveChunks({
-      collection_id: 1,
+    const context = await dewy.kb.retrieveChunks({
+      collection: "main",
       query: "tell me about RAG", 
       n: 10,
     });

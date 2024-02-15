@@ -48,8 +48,8 @@ Finally, you may need to manage documents that change over time - this can be ch
   const dewy = new Dewy();
 
   // Dewy takes it from here
-  await dewy.default.addDocument({
-    collection_id: 1,
+  await dewy.kb.addDocument({
+    collection: "main",
     url: 'https://arxiv.org/abs/2005.11401',
   });
   ```
@@ -64,7 +64,7 @@ Finally, you may need to manage documents that change over time - this can be ch
 
   # Dewy takes it from here
   add_document(
-    collection_id = 1,
+    collection = "main",
     url = “https://arxiv.org/abs/2005.11401”,
     client = client,
   )
@@ -87,8 +87,8 @@ Complicating things further, LLM-based applications often deal with subjective t
 <TabItem value="typescript" default>
 ```typescript
 // Get chunks relevant to a user's question
-const context = await dewy.default.retrieveChunks({
-  collection_id: 1,
+const context = await dewy.kb.retrieveChunks({
+  collection: "main",
   query: 'Tell me about RAG', 
   n: 10,
 });
@@ -102,7 +102,7 @@ from dewy_client.models import RetrieveRequest
 
 # Get chunks relevant to a user's question
 retrieved = await retrieve_chunks.asyncio(RetrieveRequest(
-  collection_id = 1,
+  collection = "main",
   query = "Tell me about RAG",
   n = 10,
 ), client=client)
