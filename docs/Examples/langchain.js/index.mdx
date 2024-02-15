@@ -1,0 +1,400 @@
+---
+title: Question-answering CLI with LangChain.js
+description: This guide will walk you through building a question-answering CLI using LangChain.js for prompting, the OpenAI API for the language model, and Dewy as your knowledge base.  
+---
+
+# A Question-Answering CLI with Dewy and LangChain.js
+
+In this tutorial, we're focusing on how to build a question-answering CLI tool using Dewy and LangChain.js. Dewy is an open-source knowledge base that helps developers organize and retrieve information efficiently. LangChain.js is a framework that simplifies the integration of large language models (LLMs) into applications. By combining Dewy's capabilities for managing knowledge with LangChain.js's LLM integration, you can create tools that answer complex queries with precise and relevant information. 
+
+This guide walks you through setting up your environment, loading documents into Dewy, and using an LLM through LangChain.js to answer questions based on the stored data. It's designed for engineers looking to enhance their projects with advanced question-answering functionalities.
+
+## Prerequisites
+
+Before diving into the tutorial, ensure you have the following prerequisites covered:
+- Basic knowledge of Typescript programming
+- Familiarity with CLI tools development
+- A copy of Dewy running on your local machine (see Dewy's [installation instructions](https://dewykb.github.io/docs/Getting%20Started/installation) if you need help here).
+
+## Step 1: Set Up Your Project
+
+:::info
+The final code for this example is available [in the Dewy repo](https://github.com/DewyKB/dewy-ts/tree/main/examples/qa_with_langchainjs) if you'd like to jump ahead.
+:::
+
+First, create a directory for the TypeScript CLI project and change into the directory
+
+```sh
+mkdir dewy_qa
+cd dewy_qa
+```
+
+With the directory set up, you can install TypeScript and initialize the project:
+
+```sh
+npm init -y
+npm i typescript --save-dev
+npx tsc --init
+```
+
+Depending on your environment, you may need to make some changes to your TypeScript config. Make sure that your `tsconfig.json` looks something like the following:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "CommonJS", 
+    "moduleResolution": "node", 
+    "declaration": true,
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "strict": true,
+}
+```
+
+Now you're ready to create the CLI application. To keep the code from getting too messy, organize it into several directories, with the following layout
+
+```sh
+dewy_qa/
+├── commands/
+│   └── ...
+├── utils/
+│   └── ...
+├── index.ts
+├── package.json
+└── tsconfig.ts
+```
+
+Each command will be implemented in the `commands` directory, and shared code will go in the `utils` directory. The entrypoint to the CLI application is the file `index.ts`. 
+
+Start with a simple "hello world" version of `index.ts` - you'll start filling it out in the next section
+
+```typescript
+#!/usr/bin/env ts-node-script
+
+console.log("hello world");
+```
+
+To verify the environment is setup correctly, try running the following command - you should see "hello world" printed in the console:
+
+```sh
+npx ts-node index.ts
+```
+
+Rather than typing out this very long command every time, let's create an entry in `package.json` for the command. This will help us remember how to invoke the CLI, and make it easier to install as a command:
+
+```json
+{
+  ...
+  "bin": {
+    "dewy_qa": "./index.ts"
+  }
+  ...
+}
+```
+
+Now you can run your script with `npm exec dewy_qa` or `npm link` the package and run it as just `dewy_qa`
+
+## Step 2: Implement document loading
+
+Load documents by setting up the Dewy client. The first step is to add some dependencies to the project. The first is `dewy-ts`, the client library for Dewy. The second is `commander`, which will help us build a CLI application with argument parsing, subcommands, and more. Finally, `chalk` to makes the prompts more colorful.
+
+```sh
+npm install dewy-ts commander chalk
+```
+
+Next, implement the load command's logic. You'll do this in a separate file named `commands/load.ts`. This file implements a function named `load`, which expects a URL and some additional options - this will be wired up with the CLI in a later section.
+
+Dewy makes document loading super simple - just setup the client and call `addDocument` with the URL of the file you'd like to load. Dewy takes care of extracting the PDF's contents, splitting them into chunks just the right size for sending to an LLM and indexing them for semantic search.
+
+```typescript
+import { Dewy } from 'dewy-ts'; 
+
+import { success, error } from '../utils/colors';
+
+export async function load(url: string, options: { collection: string, dewy_endpoint: string }): Promise<void> {
+  console.log(success(`Loading ${url} into collection: ${options.collection}`));
+
+  try {
+    const dewy = new Dewy({
+        BASE: options.dewy_endpoint
+    })
+
+    const result = await dewy.kb.addDocument({ collection: options.collection, url });
+
+    console.log(success(`File loaded successfully`));
+    console.log(JSON.stringify(result, null, 2));
+
+  } catch (err: any) {
+    console.error(error(`Failed to load file: ${err.message}`));
+  }
+}
+```
+
+You may have noticed that some functions were imported from `../utils/colors`. This file just sets up some helpers for coloring console output - put it in `utils` so it can be used elsewhere:
+
+```typescript
+import chalk from 'chalk';
+
+export const success = (message: string) => chalk.green(message);
+export const info = (message: string) => chalk.blue(message);
+export const error = (message: string) => chalk.red(message);
+```
+
+## Step 3: Implement question-answering
+
+With the ability to load documents into Dewy, it's time to integrate LangChain.js to utilize LLMs for answering questions. This step involves setting up LangChain.js to query the Dewy knowledge base and process the results using an LLM to generate answers. 
+
+To start, install some additional pacakges - `langchain` and `openai` to use the OpenAI API as LLM:
+
+```sh   
+npm install dewy-langchain langchain @langchain/openai openai
+```
+
+:::info
+This command is sort of long, so we'll walk through several pieces of it before combining them in the end
+:::
+
+### Create Clients for OpenAI and Dewy
+
+The first thing to setup is Dewy (as before) and an LLM. One difference from before is that `dewy` is used to build a `DewyRetriever`: this is a special type used by LangChain for retrieving information as part of a chain. You'll see how the retriever is used in a just a minute.
+
+```typescript
+const model = new ChatOpenAI({
+    openAIApiKey: options.openai_api_key,
+});
+const dewy = new Dewy({
+    BASE: options.dewy_endpoint
+})
+
+const retriever = new DewyRetriever({ dewy, collection });
+```
+
+### Create a LangChain Prompt
+
+This is a string template that instructs the LLM how it should behave, with placeholders for additional context which will be provided when the "chain" is created. In this case, the LLM is instructed to answer the question, but only using the information it's provided. This reduces the model's tendency to "hallucinate", or make up an answer that's plausible but wrong.  The values of `context` and `question` are provided in the next step:
+
+```typescript
+const prompt =
+PromptTemplate.fromTemplate(`Answer the question 
+based only on the following context:
+
+{context}
+
+Question: {question}`);
+```
+
+### Build the Chain
+
+LangChain works by building up "chains" of behavior that control how to query the LLM and other data sources. This example uses [LCEL](https://python.langchain.com/docs/expression_language/), which provides a more flexible programming experience than some of LangChain's original interfaces.
+
+Use a `RunnableSequence` to create an LCEL chain. This chain describes how to generate the `context` and `question` values: the context is generated using the retriever created earlier, and the question is generated by passing through the step's input. The results Dewy retrieves are formatted as a string by piping them to the `formatDocumentsAsString` function. 
+
+This chain does the following:
+
+1. It retrieves documents using the `DewyRetriever` and assigns them to `context` and assigns the chain's input value to `question`.
+1. It formats the prompt string using the `context` and `question` variables.
+1. It passes the formatted prompt to the LLM to generate a response.
+1. It formats the LLM's response as a string.
+
+```typescript
+const chain = RunnableSequence.from([
+    {
+        context: retriever.pipe(formatDocumentsAsString),
+        question: new RunnablePassthrough(),
+    },
+    prompt,
+    model,
+    new StringOutputParser(),
+]);
+```
+
+### Execute the chain
+
+Now that the chain has been constructed, execute it and output the results to the console. As you'll see, `question` is an input argument provided by the caller of the function.
+
+Executing the chain using `chain.streamLog()` allows you to see each response chunk as it's returned from the LLM. The stream handler loop is sort of ugly, but it's just filtering to appropriate stream results and writing them to `STDOUT` (using `console.log` it would have added newlines after each chunk).
+
+```typescript
+const stream = await chain.streamLog(question);
+
+// Write chunks of the response to STDOUT as they're received
+console.log("Answer:");
+for await (const chunk of stream) {
+    if (chunk.ops?.length > 0 && chunk.ops[0].op === "add") {
+        const addOp = chunk.ops[0];
+        if (
+        addOp.path.startsWith("/logs/ChatOpenAI") &&
+        typeof addOp.value === "string" &&
+        addOp.value.length
+        ) {
+        process.stdout.write(addOp.value);
+        }
+    }
+}
+```
+
+### Pull it all together as a command
+
+Now that you've seen all the pieces, you're ready to create the `query` command. This should look similar to the `load` command from before, with some additional imports. 
+
+```typescript
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import { PromptTemplate } from "@langchain/core/prompts";
+import { formatDocumentsAsString } from "langchain/util/document";
+import { RunnablePassthrough, RunnableSequence } from "@langchain/core/runnables";
+import { ChatOpenAI } from "@langchain/openai";
+
+import { Dewy } from 'dewy-ts'; 
+import { DewyRetriever } from 'dewy-langchain';
+
+import { success, error } from '../utils/colors';
+
+export async function query(question: string, options: { collection: string, dewy_endpoint: string, openai_api_key: string }): Promise<void> {
+  console.log(success(`Querying ${options.collection} collection for: "${question}"`));
+
+  try {
+    const model = new ChatOpenAI({
+        openAIApiKey: options.openai_api_key,
+    });
+    const dewy = new Dewy({
+        BASE: options.dewy_endpoint
+    })
+
+    const retriever = new DewyRetriever({ dewy, collection: options.collection });
+
+    const prompt =
+    PromptTemplate.fromTemplate(`Answer the question based only on the following context:
+    {context}
+
+    Question: {question}`);
+
+    const chain = RunnableSequence.from([
+        {
+            context: retriever.pipe(formatDocumentsAsString),
+            question: new RunnablePassthrough(),
+        },
+        prompt,
+        model,
+        new StringOutputParser(),
+    ]);
+
+    const stream = await chain.streamLog(question);
+
+    // Write chunks of the response to STDOUT as they're received
+    console.log("Answer:");
+    for await (const chunk of stream) {
+        if (chunk.ops?.length > 0 && chunk.ops[0].op === "add") {
+          const addOp = chunk.ops[0];
+          if (
+            addOp.path.startsWith("/logs/ChatOpenAI") &&
+            typeof addOp.value === "string" &&
+            addOp.value.length
+          ) {
+            process.stdout.write(addOp.value);
+          }
+        }
+    }
+
+  } catch (err: any) {
+    console.error(error(`Failed to query: ${err.message}`));
+  }
+}
+```
+
+## Step 4: Building the CLI
+
+With Dewy and LangChain.js integrated, the next step is to build the CLI interface. Use a library like `commander` to create a user-friendly command-line interface that supports commands for loading documents into Dewy and querying the knowledge base using LangChain.js.
+
+
+First, rewrite `index.ts` to create the subcommands `load` and `query`. The `--collection` argument determines which Dewy collection the document should be loaded into (Dewy lets you organize documents into different collections, similar to file folders). The `--dewy-endpoint` argument lets you specify how to connect to Dewy - by default an instance running locally on port `8000` is assumed. Finally, the `--openai_api_key` argument (which defaults to an environment variable) configures the OpenAI API:
+
+```typescript
+#!/usr/bin/env ts-node-script
+
+import { Command } from 'commander';
+import { load } from './commands/load';
+import { query } from './commands/query';
+
+const program = new Command();
+
+program.name('dewy-qa').description('CLI tool for interacting with a knowledge base API').version('1.0.0');
+
+const defaultOpenAIKey = process.env.OPENAI_API_KEY;
+
+program
+  .command('load')
+  .description("Load documents into Dewy from a URL")
+  .option('--collection <collection>', 'Specify the collection name', 'main')
+  .option('--dewy-endpoint <endpoint>', 'Specify the collection name',  'http://localhost:8000')
+  .argument('<url>', 'URL to load into the knowledge base')
+  .action(load);
+
+program
+  .command('query')
+  .description('Ask questions using an LLM and the loaded documents for answers')
+  .option('--collection <collection>', 'Specify the collection name', 'main')
+  .option('--dewy-endpoint <endpoint>', 'Specify the collection name',  'http://localhost:8000')
+  .option('--openai-api-key <key>', 'Specify the collection name', defaultOpenAIKey)
+  .argument('<question>', 'Question to ask the knowledge base')
+  .action(query);
+
+program.parse(process.argv);
+```
+
+OK, all done - wasn't that easy? You can try it out by running the command:
+
+```sh
+dewy_qa load https://arxiv.org/pdf/2009.08553.pdf
+```
+
+You should see something like
+
+```sh
+Loading https://arxiv.org/pdf/2009.08553.pdf into collection: main
+File loaded successfully
+{
+  "id": 18,
+  "collection": "main",
+  "extracted_text": null,
+  "url": "https://arxiv.org/pdf/2009.08553.pdf",
+  "ingest_state": "pending",
+  "ingest_error": null
+}
+```
+
+:::tip
+Extracting the content of a large PDF can take a minute or two, so you'll often see `"ingest_state": "pending"` when you first load a new document.
+:::
+
+Next, try asking some questions:
+
+```sh
+dewy_qa query "tell me about RAG
+```
+
+You should see something like
+
+```sh
+Querying main collection for: "tell me about RAG"
+Answer:
+Based on the given context, RAG refers to the RAG proteins, 
+which are involved in DNA binding and V(D)J recombination. 
+The RAG1 and RAG2 proteins work together to bind specific 
+DNA sequences known as RSS (recombination signal sequences) 
+and facilitate the cutting and rearrangement of DNA segments 
+during the process of V(D)J recombination...
+```
+
+## Conclusion
+
+By following this guide, you've learned how to create a CLI that uses Dewy to manage knowledge and LangChain.js to process questions and generate answers. This tool demonstrates the practical application of combining a structured knowledge base with the analytical power of LLMs, enabling developers to build more intelligent and responsive applications. 
+
+## Further Reading and Resources
+
+- Dewy GitHub repository: [https://github.com/Dewy](https://github.com/DewyKB/dewy)
+- Dewy TypeScript client repository: [https://github.com/DewyKB/dewy-ts](https://github.com/DewyKB/dewy-ts)
+- Dewy LangChain integration repository: [https://github.com/DewyKB/dewy_langchainjs](https://github.com/DewyKB/dewy_langchainjs)
+- LangChain.js documentation: [https://js.langchain.com](https://js.langchain.com)
+- OpenAI documentation: [https://platform.opnai.com](https://platform.openai.com/docs/introduction)
+
