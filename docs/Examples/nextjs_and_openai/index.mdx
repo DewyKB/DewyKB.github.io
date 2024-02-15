@@ -39,7 +39,7 @@ The final code is available [as an example](https://github.com/DewyKB/dewy-ts/tr
    ```sh
    OPENAI_API_KEY=<your_openai_api_key_here>
    DEWY_ENDPOINT=localhost:8000
-   DEWY_COLLECTION_ID=1
+   DEWY_COLLECTION=main
    ```
 
 ### Step 2: Create an API endpoint to add documents
@@ -59,8 +59,8 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const url = formData.get('url');
 
-    const document = await dewy.default.addDocument({
-        collection_id: process.env.DEWY_COLLECTION_ID,
+    const document = await dewy.kb.addDocument({
+        collection: process.env.DEWY_COLLECTION,
         url,
     });
 
@@ -88,8 +88,8 @@ Dewy takes care of downloading the document, extracting information from it and 
 
     export async function generate({query}) {
         // Search Dewy for chunks relevant to the given query.
-        const context = await dewy.default.retrieveChunks({
-            collection_id: process.env.DEWY_COLLECTION_ID,
+        const context = await dewy.kb.retrieveChunks({
+            collection: process.env.DEWY_COLLECTION,
             query: query, 
             n: 10,
         });
