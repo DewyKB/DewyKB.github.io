@@ -63,7 +63,7 @@ Finally, you may need to manage documents that change over time - this can be ch
   client = Client(base_url="http://localhost:8000")
 
   # Dewy takes it from here
-  add_document(
+  await add_document.asyncio(
     collection = "main",
     url = “https://arxiv.org/abs/2005.11401”,
     client = client,
