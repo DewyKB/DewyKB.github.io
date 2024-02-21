@@ -1,5 +1,6 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
+import { EnumChangefreq } from 'sitemap';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
@@ -49,6 +50,9 @@ const config: Config = {
         gtag: {
           trackingID: 'G-EKMFC8FKD0',
           anonymizeIP: true,
+        },
+        sitemap: {
+          changefreq: EnumChangefreq.DAILY,
         }
       } satisfies Preset.Options,
     ],
