@@ -6,6 +6,7 @@
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",
+    "gen-api-docs": "docusaurus gen-api-docs all",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -25,6 +26,8 @@
     "@mui/icons-material": "^5.15.6",
     "@mui/material": "^5.15.7",
     "clsx": "^2.0.0",
+    "docusaurus-plugin-openapi-docs": "^3.0.0-beta.5",
+    "docusaurus-theme-openapi-docs": "^3.0.0-beta.5",
     "prism-react-renderer": "^2.3.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"

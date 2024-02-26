@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'Dewy',
-  tagline: 'The Knowledgebase for AI',
+  tagline: 'The Knowledge Base API for GenAI',
   favicon: 'img/favicon.svg',
 
   // Set the production url of your site here
@@ -36,13 +36,13 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/DewyKB/DewyKB.github.io/tree/main/',
+          editUrl: 'https://github.com/DewyKB/DewyKB.github.io/tree/main/',
+          docRootComponent: "@theme/DocRoot",
+          docItemComponent: "@theme/ApiItem" // derived from docusaurus-theme-openapi-docs
         },
         blog: {
           showReadingTime: true,
+          editUrl: 'https://github.com/DewyKB/DewyKB.github.io/tree/main/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -124,6 +124,23 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
     },
   } satisfies Preset.ThemeConfig,
+
+  themes: ["docusaurus-theme-openapi-docs"], // export theme components
+  plugins: [
+    [
+      'docusaurus-plugin-openapi-docs',
+      {
+        id: "api", // plugin id
+        docsPluginId: "classic", // id of plugin-content-docs or preset for rendering docs
+        config: {
+          dewy: {
+            specPath: "specs",
+            outputDir: "docs/api",
+          },
+        }
+      },
+    ]
+  ]
 };
 
 export default config;

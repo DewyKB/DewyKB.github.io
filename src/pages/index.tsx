@@ -14,15 +14,26 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
+        <img src='img/logo.svg' height="100px"/>
         <Heading as="h1" className="hero__title">
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
+
+        <p className={styles.heroDescription}>
+          Dewy is a self-hostable service for indexing documents and retrieving knowledge with a simple Rest API usable from any language.
+        </p>
+
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
             to="/docs/intro">
-            Dewy Tutorial - 5min ⏱️
+            Tutorial - 5min ⏱️
+          </Link>
+          <Link
+            className="button button--secondary button--lg"
+            to="/docs/UserManual/integrations">
+            Integrations - 5min ⏱️
           </Link>
         </div>
       </div>

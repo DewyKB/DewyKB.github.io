@@ -10,6 +10,13 @@
   overflow: hidden;
 }
 
+.heroDescription {
+  width: 50%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @media screen and (max-width: 996px) {
   .heroBanner {
     padding: 2rem;
@@ -20,4 +27,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.buttons a {
+  margin-left: 1rem;
+}
+.buttons a:first-child {
+  margin-left: 0;
 }
