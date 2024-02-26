@@ -32,7 +32,7 @@ function HomepageHeader() {
           </Link>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/UserManual/integrations">
+            to="/docs/integrations">
             Integrations - 5min ⏱️
           </Link>
         </div>
