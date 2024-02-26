@@ -18,15 +18,21 @@ See the [OpenAPI documentation](api/dewy-knowledge-base-api) for available metho
 
 The OpenAPI client for Dewy is published to PyPI as [`dewy-client`](https://pypi.org/project/dewy-client/).
 
+- For LangChain, see [LangChain](#langchain) for a `DewyRetriever`.
+
 ### Javascript / Typescript
 
 The OpenAPI client for Dewy is published to NPM as [`dewy-ts`](https://www.npmjs.com/package/dewy-ts).
 
-## Integrations
+- For LangChainJS, see [LangChainJS](#langchainjs) for a `DewyRetriever`.
+- [Building a RAG chatbot with NextJS, OpenAI & Dewy](../blog/rag-app-with-nextjs-openai-and-dewy).
+
+## Frameworks
 
 ### LangChainJS
 
 [`dewy-langchainjs`](https://www.npmjs.com/package/dewy-langchainjs) provides a LangChainJS retriever backed by the Dewy API.
+See [Building a question-answering CLI with LangChain.js and Dewy](../blog/qa-cli-with-langchain).
 
 ### LangChain
 
