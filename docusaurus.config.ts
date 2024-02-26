@@ -136,6 +136,7 @@ const config: Config = {
           dewy: {
             specPath: "specs",
             outputDir: "docs/api",
+            hideSendButton: true,
           },
         }
       },
