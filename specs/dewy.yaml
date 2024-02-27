@@ -5,7 +5,7 @@ info:
   description: "This API allows ingesting and retrieving knowledge.\n\n        Knowledge\
     \ comes in a variety of forms -- text, image, tables, etc. and\n        from a\
     \ variety of sources -- documents, web pages, audio, etc."
-  version: 0.2.0
+  version: 0.3.0
 servers:
 - url: http://localhost:8000
   description: Local server
@@ -59,6 +59,34 @@ paths:
       summary: Get Collection
       description: Get a specific collection.
       operationId: getCollection
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The collection name.
+          title: Name
+        description: The collection name.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - kb
+      summary: Delete Collection
+      description: Delete a collection and all documents contained within it.
+      operationId: deleteCollection
       parameters:
       - name: name
         in: path
@@ -181,6 +209,34 @@ paths:
       - kb
       summary: Get Document
       operationId: getDocument
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          description: The document ID.
+          title: Id
+        description: The document ID.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - kb
+      summary: Delete Document
+      description: Delete a document.
+      operationId: deleteDocument
       parameters:
       - name: id
         in: path
