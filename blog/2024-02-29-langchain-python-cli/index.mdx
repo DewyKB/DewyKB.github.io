@@ -1,0 +1,347 @@
+---
+slug: langchain-python-client
+title: Building a question-answering CLI with LangChain and Dewy
+description: This guide will walk you through building a question-answering CLI using LangChain for prompting, the OpenAI API for the language model, and Dewy as your knowledge base for retrieval augmented generation (RAG).
+image: ./banner.png
+keywords:
+  - question-answering CLI
+  - Dewy knowledge base
+  - Retrieval augmented generation
+  - LangChain tutorial
+  - integrating LLMs in applications
+  - open-source knowledge management
+  - building CLI tools
+  - Python programming
+  - Dewy and LangChain integration
+  - creating intelligent applications
+  - LLM question answering
+  - document-based knowledge systems
+  - CLI script development
+  - managing structured knowledge
+  - processing complex queries
+  - contextually relevant answers
+  - Dewy installation guide
+  - LangChain capabilities
+  - knowledge-driven development
+  - efficient information retrieval
+  - advanced application features
+authors:
+  - ben
+---
+
+# Building a Question-Answering CLI with Dewy and LangChain
+
+![LangChain + Dewy](./banner.svg)
+
+In this tutorial, we're focusing on how to build a question-answering CLI tool using Dewy and LangChain. Dewy is an open-source knowledge base that helps developers organize and retrieve information efficiently. LangChain is a framework that simplifies the integration of large language models (LLMs) into applications. By combining Dewy's capabilities for managing knowledge with LangChain's LLM integration, you can create tools that answer complex queries with precise and relevant information.
+
+The use of a knowledge base to augment the capabilities of an LLM is referred to as retrieval augmented generation or RAG. This guide walks you through setting up a simple command-line RAG application. It covers everything from setting up your environment andi loading documents into Dewy to using an LLM through LangChain to answer questions based on the retrieved results. It's designed for engineers looking to enhance their projects with advanced question-answering functionalities.
+
+{/* truncate */}
+
+## Why Dewy and LangChain?
+
+**Dewy** is an OSS knowledge base designed to streamline the way developers store, organize, and retrieve information. Its flexibility and ease of use make it an excellent choice for developers aiming to build knowledge-driven applications.
+
+**LangChain**, on the other hand, is a powerful framework that enables developers to integrate LLMs into their applications seamlessly. By combining Dewy's structured knowledge management with LangChain.js's LLM capabilities, developers can create sophisticated question-answering systems that can understand and process complex queries, offering precise and contextually relevant answers.
+
+## The Goal
+
+Our aim is to build a simple yet powerful question-answering CLI script. This script will allow users to load documents into the Dewy knowledge base and then use an LLM, through LangChain, to answer questions based on the information stored in Dewy. This tutorial will guide you through the process, from setting up your environment to implementing the CLI script.
+
+You'll learn how to use LangChain to build a simple question-answering application, and how to integrate Dewy as a source of knowledge, allowing your application to answer questions based on specific documents you provide it.
+
+## Prerequisites
+
+Before diving into the tutorial, ensure you have the following prerequisites covered:
+
+- Basic knowledge of Python programming
+- Familiarity with CLI tools development
+- A copy of Dewy running on your local machine (see Dewy's [installation instructions](../docs/GettingStarted/installation) if you need help here).
+
+## Step 1: Set Up Your Project
+
+:::info
+The final code for this example is available [in the Dewy repo](https://github.com/DewyKB/dewy/tree/main/demos/python-langchain-cli) if you'd like to jump ahead.
+:::
+
+First, create a directory for the CLI project and change into the directory
+
+```sh
+mkdir dewy_qa
+cd dewy_qa
+```
+
+With the directory set up, you can create and initialize a project using Poetry:
+
+```sh
+poetry init
+```
+
+When it asks about defining your main dependencies interactively you can choose yes and enter the following:
+
+  - `langchain-core` which we'll use for the orchestration
+  - `langchain-openai` which we'll use for the OpenAI LLM interface
+  - `click` which we'll use for the CLI
+  - `dewy-langchain` which provides the LangChain retriver querying Dewy
+
+Now you're ready to create the CLI application.
+
+We're using `click`, which lets us create a CLI using decorators on methods.
+To start, we'll create a "group" for the two commands we're going to implement -- one for adding a document and one for asking a question.
+
+```python title="CLI entry point"
+@click.group()
+@click.option("--collection", default="main")
+@click.option("--base_url", default="http://localhost:8000")
+@click.pass_context
+def cli(ctx, collection, base_url):
+    # ensure that ctx.obj exists and is a dict (in case `cli()` is called
+    # by means other than the `if` block below)
+    ctx.ensure_object(dict)
+
+    ctx.obj["base_url"] = base_url
+    ctx.obj["collection"] = collection
+
+# Commands will go here
+
+if __name__ == "__main__":
+    cli()
+```
+
+In addition to creating a group, this does the following:
+
+- Accepts a `collection` argument indicating which Dewy collection to operate on.
+- Accepts a `base_url` argument (with a default) indicating which Dewy service to connect to.
+- Stores both of those options on the context.
+- Executes the `cli` group when invoked.
+
+Adding these options to the root allows them to be passed before the specific command, and makes it clear they apply to all (or most) of the commands in the CLI application we're building.
+
+Now you can run your script with `poetry run python -m dewy_qa`.
+
+## Step 2: Implement document loading
+
+Load documents by setting up the Dewy client. The following code adds an `add_file` command which accepts a single positional `url_or_file`. If that corresponds to a valid file path, it uploads the file to Dewy. Otherwise, it creates the document from the given URL and Dewy will fetch it. This logic could be improved (eg., `file://` URLs should be uploaded) but it demonstrates several key abilities:
+
+1. You can create a document from a URL, and Dewy will download and ingest the file.
+2. You can create a document without associated content, and then upload content which Dewy will ingest.
+
+```python title="Add File Command"
+@cli.command()
+@click.pass_context
+@click.argument("url_or_file")
+def add_file(ctx, url_or_file):
+    from dewy_client.api.kb import add_document, upload_document_content
+    from dewy_client.models import AddDocumentRequest, BodyUploadDocumentContent
+    from dewy_client.types import File
+
+    client = Client(ctx.obj["base_url"])
+    if os.path.isfile(url_or_file):
+        document = add_document.sync(
+            client=client,
+            body=AddDocumentRequest(
+                collection=ctx.obj["collection"],
+            ),
+        )
+        print(f"Added document {document.id}. Uploading content.")
+
+        with open(url_or_file, "rb") as file:
+            payload = file.read()
+            upload_document_content.sync(
+                document.id,
+                client=client,
+                body=BodyUploadDocumentContent(
+                    content=File(
+                        payload=payload,
+                        file_name=os.path.basename(url_or_file),
+                    ),
+                ),
+            )
+        print(f"Uploaded content for document {document.id}.")
+
+    else:
+        document = add_document.sync(
+            client=client,
+            body=AddDocumentRequest(collection=ctx.obj["collection"], url=url_or_file),
+        )
+        print(f"Added document {document.id} from URL '{url_or_file}'")
+```
+At this point, you should be able to load a document from a URL or local PDF using the command `poetry run python -m dewy_qa <url_or_file>`.
+For example, you could use `https://arxiv.org/pdf/2009.08553.pdf` to load a PDF from Arxiv.
+
+:::note Updating documents
+
+You may ask -- "what happens if I upload content to a document that is already ingested?" Conveniently, Dewy will treat this as a new version of the document and re-ingest it!
+
+:::
+
+## Step 3: Implement question-answering
+
+With the ability to load documents into Dewy, it's time to integrate LangChain to invoke LLMs for answering questions. This step involves setting up LangChain to query the Dewy knowledge base and process the results using an LLM to generate answers.
+
+We're going to introduce a `query` command which accepts a file containing the question (or reads it from stdin).
+We'll build this up in several steps.
+
+### Create DewyRetriever
+
+First, we'll create the `query` command and create a `DewyRetriever` for our collection.
+This is an adapter that let's LangChain know how to retrieve documents from Dewy.
+
+```python title="Create DewyRetriever"
+@cli.command()
+@click.pass_context
+@click.argument("query", type=click.File("r"), default=sys.stdin)
+def query(ctx, query):
+  # highlight-start
+  from dewy_langchain import DewyRetriever
+
+  retriever = DewyRetriever.for_collection(
+      collection=ctx.obj["collection"], base_url=ctx.obj["base_url"]
+  )
+  # highlight-end
+```
+
+### Create a PromptTemplate
+
+
+This is a string template that tells LangChain how to create the prompt for the LLM. In this case, the LLM is instructed to answer the question, but only using the information it's provided. This reduces the model's tendency to "hallucinate", or make up an answer that's plausible but wrong.  The values of `context` and `question` will be configured when we assemble the "chain".
+
+```python title="Prompt Template"
+@cli.command()
+@click.pass_context
+@click.argument("query", type=click.File("r"), default=sys.stdin)
+def query(ctx, query):
+    from dewy_langchain import DewyRetriever
+    # highlight-start
+    from langchain_core.prompts import ChatPromptTemplate
+    # highlight-end
+
+    retriever = DewyRetriever.for_collection(
+        collection=ctx.obj["collection"], base_url=ctx.obj["base_url"]
+    )
+
+    # highlight-start
+    prompt = ChatPromptTemplate.from_template(
+        """Answer the question based only on the following context:
+    {context}
+
+    Question: {question}
+    """
+    )
+    # highlight-end
+```
+
+### Create the Chain
+
+LangChain works by building up "chains" of behavior that control how to query the LLM and other data sources. This example uses [LCEL](https://python.langchain.com/docs/expression_language/), which provides a more flexible programming experience than some of LangChain's original interfaces.
+
+Use a `RunnableSequence` to create an LCEL chain. This chain describes how to generate the `context` and `question` values: the context is generated using the retriever created earlier, and the question is generated by passing through the step's input. The results Dewy retrieves are formatted as a string by piping them to the `formatDocumentsAsString` function.
+
+This chain does the following:
+
+1. It retrieves documents using the `DewyRetriever` and assigns them to `context` and assigns the chain's input value to `question`.
+1. It formats the prompt string using the `context` and `question` variables.
+1. It passes the formatted prompt to the LLM to generate a response.
+1. It formats the LLM's response as a string.
+
+```python title="Create the Chain"
+@cli.command()
+@click.pass_context
+@click.argument("query", type=click.File("r"), default=sys.stdin)
+def query(ctx, query):
+    from dewy_langchain import DewyRetriever
+    # highlight-start
+    from langchain_core.output_parsers import StrOutputParser
+    # highlight-end
+    from langchain_core.prompts import ChatPromptTemplate
+    # highlight-start
+    from langchain_core.runnables import RunnablePassthrough
+    from langchain_openai import ChatOpenAI
+    # highlight-end
+
+    retriever = DewyRetriever.for_collection(
+        collection=ctx.obj["collection"], base_url=ctx.obj["base_url"]
+    )
+
+    prompt = ChatPromptTemplate.from_template(
+        """Answer the question based only on the following context:
+    {context}
+
+    Question: {question}
+    """
+    )
+
+    # highlight-start
+    model = ChatOpenAI()
+
+    chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | prompt
+        | model
+        | StrOutputParser()
+    )
+    # highlight-end
+```
+
+### Invoke the Chain and Print Results
+
+Now that the chain has been constructed, execute it and output the results to the console. As you'll see, `question` is an input argument provided by the caller of the function.
+
+Executing the chain using `chain.streamLog()` allows you to see each response chunk as it's returned from the LLM. The stream handler loop is sort of ugly, but it's just filtering to appropriate stream results and writing them to `STDOUT` (using `console.log` it would have added newlines after each chunk).
+
+```python title="Invoke the Chain"
+@cli.command()
+@click.pass_context
+@click.argument("query", type=click.File("r"), default=sys.stdin)
+def query(ctx, query):
+    from dewy_langchain import DewyRetriever
+    from langchain_core.output_parsers import StrOutputParser
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_core.runnables import RunnablePassthrough
+    from langchain_openai import ChatOpenAI
+
+    retriever = DewyRetriever.for_collection(
+        collection=ctx.obj["collection"], base_url=ctx.obj["base_url"]
+    )
+
+    prompt = ChatPromptTemplate.from_template(
+        """Answer the question based only on the following context:
+    {context}
+
+    Question: {question}
+    """
+    )
+
+    model = ChatOpenAI()
+
+    chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | prompt
+        | model
+        | StrOutputParser()
+    )
+
+    # highlight-start
+    query_str = query.read()
+    click.echo(f"Invoking chain for:\n{query_str}")
+    result = chain.invoke(query_str)
+    click.echo(f"\n\nAnswer:\n{result}")
+    # highlight-end
+```
+
+### Trying it out
+
+Now you can run `echo "<your question>" | poetry run python -m dewy_qa query`.
+
+## Conclusion
+
+By following this guide, you've learned how to create a CLI that uses Dewy to manage knowledge and LangChain to process questions and generate answers. This tool demonstrates the practical application of combining a structured knowledge base with the analytical power of LLMs, enabling developers to build more intelligent and responsive applications.
+
+## Further Reading and Resources
+
+- Dewy GitHub repository: [https://github.com/Dewy](https://github.com/DewyKB/dewy)
+- Dewy LangChain integration repository: [https://github.com/DewyKB/dewy_langchain](https://github.com/DewyKB/dewy_langchain)
+- LangChain documentation: [https://python.langchain.com](https://python.langchain.com)
+- OpenAI documentation: [https://platform.opnai.com](https://platform.openai.com/docs/introduction)
+
