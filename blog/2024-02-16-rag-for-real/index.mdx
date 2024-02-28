@@ -49,6 +49,8 @@ As developers, we sometimes find ourselves at the transition from experimentatio
 
 This post presents some of the surprising challenges specific to building RAG applications, and offers concrete solutions to help you build a successful application. The goal is to help you avoid some of the common gotchas and save you some headaches down the road.
 
+{/* truncate */}
+
 ## Challenge 1: Managing changing documents and metadata
 
 **What needs to be done**: When a RAG application ingests a document, it often extracts and indexes multiple chunks to facilitate efficient search. Often times, documents are associated with metadata used for access control, hybrid search, and data organization. In a production system, the set of documents is often dynamic, changing as users interact with the application.
