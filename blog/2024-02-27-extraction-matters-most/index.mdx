@@ -6,8 +6,35 @@ description: |
   Experimental measurements of a variety of options in a RAG pipeline lead
   to the conclusion that how you extract content from documents matters most.
 keywords:
-  - retrieval augmented generation
   - RAG experimental evaluation
+  - Retrieval Augmented Generation (RAG)
+  - LangChain
+  - PDF loaders
+  - Text splitters
+  - Parent-Document Retrieval
+  - Multi-Vector indexing
+  - RAG configuration
+  - Experimentation with RAG
+  - TruLens
+  - RAGAS
+  - LangSmith
+  - Dewy (knowledge base)
+  - Evaluation frameworks for RAG
+  - Context Precision
+  - Context Recall
+  - F1 score
+  - Extractors (pypdf, pymupdf, unstructured)
+  - RAG Chunking strategies
+  - RAG Indexing strategies
+  - Semantic chunking
+  - Questions-answered multi-vector embedding
+  - RAG Search strategies
+  - Similarity search
+  - Maximum marginal relevance (MMR)
+  - Vector embeddings
+  - GenAI application
+  - Dewy API
+
 authors: [ben]
 ---
 
@@ -18,6 +45,13 @@ It is easy to be paralyzed with doubt – which of these should you use?
 ![RAG configuration choices](./configurations.svg)
 
 If you’re wondering which of these techniques are best for your domain, the long answer is – you should understand which techniques may help your documents and run experiments on your data to see which of those help.
+
+:::tip
+
+If you're in a hurry, the short answer is that how you extract information matters most
+Embeddings and advanced splitting and indexing strategies don't help (or actively hurt) retrieval.
+
+:::
 
 To understand the importance of different factors and prioritize implementation of corresponding techniques within Dewy (the open-source knowledge base we’re developing), we ran some experiments on different configurations.
 We’re posting these to hopefully save you some time by using these results as a starting point, and possibly using some of the methodology from this post for your own measurements.
@@ -50,6 +84,12 @@ For these experiments, I’m only measuring the following metrics related to ret
 
 To simplify comparisons in this post, we use the geometric mean of precision and recall.
 This is often called the “f1 score”, but since the RAGAS metrics context recall and precision are slightly different, we’ll call this the “context f1”.
+
+:::note
+
+The code for the experiments is in [the `DewyKB/dewy` GitHub project](https://github.com/DewyKB/dewy/tree/main/experiments).
+
+:::
 
 ## Results
 
