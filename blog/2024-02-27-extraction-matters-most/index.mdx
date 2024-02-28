@@ -41,10 +41,10 @@ This is very useful for monitoring your LLM application.
 RAGAS provides a variety of [metrics][ragas_metrics].
 For these experiments, I’m only measuring the following metrics related to retrieval.
 
-[Context Precision][ragas_context_precision]
+[Context Precision](https://docs.ragas.io/en/latest/concepts/metrics/context_precision.html)
 : Whether the context items relevant to the ground-truth answer are ranked higher than those irrelevant.
 
-[Context Recall][ragas_context_recall]
+[Context Recall](https://docs.ragas.io/en/latest/concepts/metrics/context_recall.html)
 : The proportion of sentences in the ground-truth answer attributed to the retrieved context.
   This uses the ground-truth answer as a proxy for the "correct" context.
 
@@ -97,9 +97,7 @@ This is another experiment we’d like to re-run on different datasets in the fu
 ### Embeddings
 
 On embeddings, we expected the larger (and better) embeddings from OpenAI ada-002 with 1536 dimensions to outperform [bge-small-en-v1.5](bge_small_en) which only has 512 dimensions.
-While we did see some improvement (2%) it was relatively minor.
-
-This suggests that embeddings are relatively insignificant to the quality of retrieval pipelines.
+While there is technically a difference, it is basically insignificant.
 
 ![Heatmap of embeddings](./heatmap_embedding.svg)
 
@@ -119,8 +117,6 @@ It provides a RAG service with built-in indexing and retrieval built on the less
 [trulens]: https://www.trulens.org/
 [ragas]: https://docs.ragas.io/en/latest/index.html
 [ragas_metrics]: https://docs.ragas.io/en/latest/concepts/metrics/index.html
-[ragas_context_precision]: https://docs.ragas.io/en/latest/concepts/metrics/context_precision.html
-[ragas_context_recall]: https://docs.ragas.io/en/latest/concepts/metrics/context_recall.html
 [langsmith]: https://www.langchain.com/langsmith
 [pypdf]: https://pypi.org/project/pypdf/
 [pymupdf]: https://pypi.org/project/pymupdf/
