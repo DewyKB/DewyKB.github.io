@@ -53,7 +53,7 @@ This is often called the “f1 score”, but since the RAGAS metrics context rec
 
 ## Results
 
-For our experiments, we ran using 3 different extractors ([pypdf][pypdf], [pymupdf][pymupdf] and [unstructured][unstructured]), 5 different chunking and indexing strategies ([recursive chunking][recursive], [parent-document chunking][parent_document], [semantic chunking][semantic], and [questions-answered multi-vector embedding][questions_answered] with both recursive and semantic chunking), 2 different embeddings (OpenAI [ada-002][openai_ada002] and [bge-en-small][bge_en_small]) and 2 different search strategies (similarity and maximum-marginal relevance).
+For our experiments, we ran using 3 different extractors ([pypdf][pypdf], [pymupdf][pymupdf] and [unstructured][unstructured]), 5 different chunking and indexing strategies ([recursive chunking][recursive], [parent-document chunking][parent_document], [semantic chunking][semantic], and [questions-answered multi-vector embedding][questions_answered] with both recursive and semantic chunking), 2 different embeddings (OpenAI [ada-002][openai_ada002] and [bge-en-small][bge_small_en]) and 2 different search strategies (similarity and maximum-marginal relevance).
 We ran the experiment and evaluation on the cross-product of all of these factors.
 
 The results are available in a [zip file][results_zip] and the [analysis notebook][notebook] used to produce the charts is available in Google Colab.
@@ -96,7 +96,7 @@ This is another experiment we’d like to re-run on different datasets in the fu
 
 ### Embeddings
 
-On embeddings, we expected the larger (and better) embeddings from OpenAI ada-002 with 1536 dimensions to outperform [bge-small-en-v1.5](https://huggingface.co/BAAI/bge-small-en-v1.5) which only has 512 dimensions.
+On embeddings, we expected the larger (and better) embeddings from OpenAI ada-002 with 1536 dimensions to outperform [bge-small-en-v1.5](bge_small_en) which only has 512 dimensions.
 While we did see some improvement (2%) it was relatively minor.
 
 This suggests that embeddings are relatively insignificant to the quality of retrieval pipelines.
@@ -130,6 +130,6 @@ It provides a RAG service with built-in indexing and retrieval built on the less
 [semantic]: https://python.langchain.com/docs/modules/data_connection/document_transformers/semantic-chunker
 [questions_answered]: https://python.langchain.com/docs/modules/data_connection/retrievers/multi_vector#hypothetical-queries
 [openai_ada002]: https://platform.openai.com/docs/guides/embeddings/embedding-models
-[bge_en_small]: https://huggingface.co/BAAI/bge-small-en-v1.5/tree/main
+[bge_small_en]: https://huggingface.co/BAAI/bge-small-en-v1.5/tree/main
 [results_zip]: https://drive.google.com/file/d/1AyfIyYrBf1sJz03cCYdbGrF4th0ed8TL/view?usp=drive_link
 [notebook]: [https://colab.research.google.com/drive/1ycGgTPvDRLuEOvK6kOfsxg_nKkki6ncG#scrollTo=VH-7g3CdqSOI]
