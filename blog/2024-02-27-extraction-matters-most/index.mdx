@@ -24,7 +24,7 @@ We’re posting these to hopefully save you some time by using these results as 
 
 ## Experimentation
 
-There are a variety of frameworks for evaluating RAG and LLM usage, such as [TruLens][trulens] and [RAGAS][...] – at the time of writing LangSmith supports evaluation but doesn’t consider the context, making it less suited for evaluating RAG.
+There are a variety of frameworks for evaluating RAG and LLM usage, such as [TruLens][trulens] and [RAGAS][ragas] – at the time of writing LangSmith supports evaluation but doesn’t consider the context, making it less suited for evaluating RAG.
 The general pattern is to record the question and answer (and often the retrieved contexts) and then use an LLM to grade the responses.
 Typically, you may ask for grades along different metrics – such as “are the retrieved contexts relevant to the question” or “is the generated answer grounded in the retrieved context”.
 This approach lets you measure the performance across a large set of generated responses, and fits well with the existing tracing systems like [LangSmith][langsmith].
