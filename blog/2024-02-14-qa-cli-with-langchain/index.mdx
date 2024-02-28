@@ -1,7 +1,7 @@
 ---
 slug: qa-cli-with-langchain
 title: Building a question-answering CLI with LangChain.js and Dewy
-description: This guide will walk you through building a question-answering CLI using LangChain.js for prompting, the OpenAI API for the language model, and Dewy as your knowledge base.  
+description: This guide will walk you through building a question-answering CLI using LangChain.js for prompting, the OpenAI API for the language model, and Dewy as your knowledge base.
 image: ./banner.png
 keywords:
   - question-answering CLI
@@ -32,7 +32,7 @@ authors:
 
 ![LangChain + Dewy](./banner.svg)
 
-In this tutorial, we're focusing on how to build a question-answering CLI tool using Dewy and LangChain.js. Dewy is an open-source knowledge base that helps developers organize and retrieve information efficiently. LangChain.js is a framework that simplifies the integration of large language models (LLMs) into applications. By combining Dewy's capabilities for managing knowledge with LangChain.js's LLM integration, you can create tools that answer complex queries with precise and relevant information. 
+In this tutorial, we're focusing on how to build a question-answering CLI tool using Dewy and LangChain.js. Dewy is an open-source knowledge base that helps developers organize and retrieve information efficiently. LangChain.js is a framework that simplifies the integration of large language models (LLMs) into applications. By combining Dewy's capabilities for managing knowledge with LangChain.js's LLM integration, you can create tools that answer complex queries with precise and relevant information.
 
 This guide walks you through setting up your environment, loading documents into Dewy, and using an LLM through LangChain.js to answer questions based on the stored data. It's designed for engineers looking to enhance their projects with advanced question-answering functionalities.
 
@@ -54,7 +54,7 @@ You'll learn how to use LangChain to build a simple question-answering applicait
 Before diving into the tutorial, ensure you have the following prerequisites covered:
 - Basic knowledge of Typescript programming
 - Familiarity with CLI tools development
-- A copy of Dewy running on your local machine (see Dewy's [installation instructions](https://dewykb.github.io/docs/Getting%20Started/installation) if you need help here).
+- A copy of Dewy running on your local machine (see Dewy's [installation instructions](../docs/GettingStarted/installation) if you need help here).
 
 ## Step 1: Set Up Your Project
 
@@ -83,8 +83,8 @@ Depending on your environment, you may need to make some changes to your TypeScr
 {
   "compilerOptions": {
     "target": "ES6",
-    "module": "CommonJS", 
-    "moduleResolution": "node", 
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "declaration": true,
     "outDir": "./dist",
     "esModuleInterop": true,
@@ -105,7 +105,7 @@ dewy_qa/
 └── tsconfig.ts
 ```
 
-Each command will be implemented in the `commands` directory, and shared code will go in the `utils` directory. The entrypoint to the CLI application is the file `index.ts`. 
+Each command will be implemented in the `commands` directory, and shared code will go in the `utils` directory. The entrypoint to the CLI application is the file `index.ts`.
 
 Start with a simple "hello world" version of `index.ts` - you'll start filling it out in the next section
 
@@ -148,7 +148,7 @@ Next, implement the load command's logic. You'll do this in a separate file name
 Dewy makes document loading super simple - just setup the client and call `addDocument` with the URL of the file you'd like to load. Dewy takes care of extracting the PDF's contents, splitting them into chunks just the right size for sending to an LLM and indexing them for semantic search.
 
 ```typescript title="commands/load.ts"
-import { Dewy } from 'dewy-ts'; 
+import { Dewy } from 'dewy-ts';
 
 import { success, error } from '../utils/colors';
 
@@ -183,11 +183,11 @@ export const error = (message: string) => chalk.red(message);
 
 ## Step 3: Implement question-answering
 
-With the ability to load documents into Dewy, it's time to integrate LangChain.js to utilize LLMs for answering questions. This step involves setting up LangChain.js to query the Dewy knowledge base and process the results using an LLM to generate answers. 
+With the ability to load documents into Dewy, it's time to integrate LangChain.js to utilize LLMs for answering questions. This step involves setting up LangChain.js to query the Dewy knowledge base and process the results using an LLM to generate answers.
 
 To start, install some additional pacakges - `langchain` and `openai` to use the OpenAI API as LLM:
 
-```sh   
+```sh
 npm install dewy-langchain langchain @langchain/openai openai
 ```
 
@@ -216,7 +216,7 @@ This is a string template that instructs the LLM how it should behave, with plac
 
 ```typescript
 const prompt =
-PromptTemplate.fromTemplate(`Answer the question 
+PromptTemplate.fromTemplate(`Answer the question
 based only on the following context:
 
 {context}
@@ -228,7 +228,7 @@ Question: {question}`);
 
 LangChain works by building up "chains" of behavior that control how to query the LLM and other data sources. This example uses [LCEL](https://python.langchain.com/docs/expression_language/), which provides a more flexible programming experience than some of LangChain's original interfaces.
 
-Use a `RunnableSequence` to create an LCEL chain. This chain describes how to generate the `context` and `question` values: the context is generated using the retriever created earlier, and the question is generated by passing through the step's input. The results Dewy retrieves are formatted as a string by piping them to the `formatDocumentsAsString` function. 
+Use a `RunnableSequence` to create an LCEL chain. This chain describes how to generate the `context` and `question` values: the context is generated using the retriever created earlier, and the question is generated by passing through the step's input. The results Dewy retrieves are formatted as a string by piping them to the `formatDocumentsAsString` function.
 
 This chain does the following:
 
@@ -276,7 +276,7 @@ for await (const chunk of stream) {
 
 ### Pull it all together as a command
 
-Now that you've seen all the pieces, you're ready to create the `query` command. This should look similar to the `load` command from before, with some additional imports. 
+Now that you've seen all the pieces, you're ready to create the `query` command. This should look similar to the `load` command from before, with some additional imports.
 
 ```typescript title="commands/query.ts"
 import { StringOutputParser } from "@langchain/core/output_parsers";
@@ -285,7 +285,7 @@ import { formatDocumentsAsString } from "langchain/util/document";
 import { RunnablePassthrough, RunnableSequence } from "@langchain/core/runnables";
 import { ChatOpenAI } from "@langchain/openai";
 
-import { Dewy } from 'dewy-ts'; 
+import { Dewy } from 'dewy-ts';
 import { DewyRetriever } from 'dewy-langchain';
 
 import { success, error } from '../utils/colors';
@@ -418,17 +418,17 @@ You should see something like
 ```sh
 Querying main collection for: "tell me about RAG"
 Answer:
-Based on the given context, RAG refers to the RAG proteins, 
-which are involved in DNA binding and V(D)J recombination. 
-The RAG1 and RAG2 proteins work together to bind specific 
-DNA sequences known as RSS (recombination signal sequences) 
-and facilitate the cutting and rearrangement of DNA segments 
+Based on the given context, RAG refers to the RAG proteins,
+which are involved in DNA binding and V(D)J recombination.
+The RAG1 and RAG2 proteins work together to bind specific
+DNA sequences known as RSS (recombination signal sequences)
+and facilitate the cutting and rearrangement of DNA segments
 during the process of V(D)J recombination...
 ```
 
 ## Conclusion
 
-By following this guide, you've learned how to create a CLI that uses Dewy to manage knowledge and LangChain.js to process questions and generate answers. This tool demonstrates the practical application of combining a structured knowledge base with the analytical power of LLMs, enabling developers to build more intelligent and responsive applications. 
+By following this guide, you've learned how to create a CLI that uses Dewy to manage knowledge and LangChain.js to process questions and generate answers. This tool demonstrates the practical application of combining a structured knowledge base with the analytical power of LLMs, enabling developers to build more intelligent and responsive applications.
 
 ## Further Reading and Resources
 

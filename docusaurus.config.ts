@@ -2,6 +2,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import { EnumChangefreq } from 'sitemap';
 import type * as Preset from '@docusaurus/preset-classic';
+import remarkDefList from 'remark-deflist';
 
 const config: Config = {
   title: 'Dewy',
@@ -38,11 +39,17 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/DewyKB/DewyKB.github.io/tree/main/',
           docRootComponent: "@theme/DocRoot",
-          docItemComponent: "@theme/ApiItem" // derived from docusaurus-theme-openapi-docs
+          docItemComponent: "@theme/ApiItem",
+          remarkPlugins: [
+            remarkDefList,
+          ]
         },
         blog: {
           showReadingTime: true,
           editUrl: 'https://github.com/DewyKB/DewyKB.github.io/tree/main/',
+          remarkPlugins: [
+            remarkDefList,
+          ]
         },
         theme: {
           customCss: './src/css/custom.css',

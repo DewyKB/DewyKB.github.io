@@ -1,9 +1,9 @@
 ---
 slug: rag-for-real
-title: RAG for Real - Gotchas to consider before building your app 
-description: Explore key challenges and solutions in transitioning RAG applications from prototype to production, covering document management, persistence, and debugging  
+title: RAG for Real - Gotchas to consider before building your app
+description: Explore key challenges and solutions in transitioning RAG applications from prototype to production, covering document management, persistence, and debugging
 image: ./banner.png
-keywords: 
+keywords:
   - RAG applications
   - RAG application challenges
   - Building RAG applications
@@ -45,7 +45,7 @@ authors:
 
 ![banner](banner.png)
 
-As developers, we sometimes find ourselves at the transition from experimentation to production wishing we'd thought of something earlier. The journey from a prototype to a fully operational application is full of challenges, especially for RAG and Gen AI applications. 
+As developers, we sometimes find ourselves at the transition from experimentation to production wishing we'd thought of something earlier. The journey from a prototype to a fully operational application is full of challenges, especially for RAG and Gen AI applications.
 
 This post presents some of the surprising challenges specific to building RAG applications, and offers concrete solutions to help you build a successful application. The goal is to help you avoid some of the common gotchas and save you some headaches down the road.
 
@@ -57,15 +57,15 @@ This post presents some of the surprising challenges specific to building RAG ap
 
 ### Design Around Documents
 
-The key to a successful RAG application lies in recognizing that vector indexes are just one component of a complete solution. Instead of treating documents as just data to be chunked and indexed, think of each document as the central entity around which your application architecture is built. 
+The key to a successful RAG application lies in recognizing that vector indexes are just one component of a complete solution. Instead of treating documents as just data to be chunked and indexed, think of each document as the central entity around which your application architecture is built.
 
 This perspective allows the development of systems that support complex interactions with documents, such as updates, deletions, and access control, in a more integrated manner. By focusing on documents, you ensure that every part of your application, from search to security, is aligned with the goal of delivering relevant, accessible, and secure content.
 
 ### Capture document-level metadata
 
-Document metadata can support many use cases, for example hybrid search and access control - but it's important to remember that a single document will be associated with an arbitrary number of extracted text chunks, images, summarizations, etc. 
+Document metadata can support many use cases, for example hybrid search and access control - but it's important to remember that a single document will be associated with an arbitrary number of extracted text chunks, images, summarizations, etc.
 
-There are two basic ways to manage this type of 1:N relationship: normalized (where you store the metadata in a separate table) and denormalized (where the metadata is duplicated and stored alongside each chunk). 
+There are two basic ways to manage this type of 1:N relationship: normalized (where you store the metadata in a separate table) and denormalized (where the metadata is duplicated and stored alongside each chunk).
 
 Whenever possible the normalized approach is preferable. For example you can store document metadata alongside documents or as a separate table and use SQL joins to associate metadata with rows in your vector index. This approach simplifies document and metadat changes, which otherwise could affect a huge number of related DB records (chunks, summaries, etc).
 
@@ -75,13 +75,13 @@ To handle the challenges of document updates and deletions efficiently, it's a g
 
 ## Challenge 2: Ensuring Persistence and Durability
 
-**What needs to be done**: Moving from a prototype to a production-ready application often means meeting more stringent requirements for data persistence and durability. Production applications need to work for multiple users concurrently, and users will be continually interacting with the application, adding & removing documents, making queries, etc. In a Jupyter notebook, local or in-memory storage may suffice for temporary experimentation, but production environments demand reliable storage solutions built for concurrent users. 
+**What needs to be done**: Moving from a prototype to a production-ready application often means meeting more stringent requirements for data persistence and durability. Production applications need to work for multiple users concurrently, and users will be continually interacting with the application, adding & removing documents, making queries, etc. In a Jupyter notebook, local or in-memory storage may suffice for temporary experimentation, but production environments demand reliable storage solutions built for concurrent users.
 
-**Why it's hard**: External databases and persistent queues introduce complexity, including network latency, data synchronization issues, and the need for robust error handling mechanisms. Ensuring the durability of vector indexes, which are crucial for the fast retrieval of information in RAG applications, requires careful selection of storage solutions that can support high read/write throughput. Finally, ingesting documents to support RAG often involves time-consuming data extraction and summarization: these processes shouldn’t happen as part of an API request, and need to be tolerant of machine failures, restarts, and code deployments. 
+**Why it's hard**: External databases and persistent queues introduce complexity, including network latency, data synchronization issues, and the need for robust error handling mechanisms. Ensuring the durability of vector indexes, which are crucial for the fast retrieval of information in RAG applications, requires careful selection of storage solutions that can support high read/write throughput. Finally, ingesting documents to support RAG often involves time-consuming data extraction and summarization: these processes shouldn’t happen as part of an API request, and need to be tolerant of machine failures, restarts, and code deployments.
 
 ### Use a durable ingestion queue
 
-A durable ingestion queue is foundational for managing the continuous addition and removal of documents by multiple users. Services like [Amazon SQS](https://aws.amazon.com/pm/sqs) and [Inngest](https://www.inngest.com) or durable databases like [Postgres](https://www.postgresql.org/) can be used to build an ingestion queue that ensures all document processing tasks are reliably captured and processed, even in the face of system failures or restarts. 
+A durable ingestion queue is foundational for managing the continuous addition and removal of documents by multiple users. Services like [Amazon SQS](https://aws.amazon.com/pm/sqs) and [Inngest](https://www.inngest.com) or durable databases like [Postgres](https://www.postgresql.org/) can be used to build an ingestion queue that ensures all document processing tasks are reliably captured and processed, even in the face of system failures or restarts.
 
 This queue acts as a buffer, absorbing spikes in activity and allowing document processing tasks to be carried out asynchronously, without impacting the responsiveness of the application to user queries. By decoupling document ingestion from immediate processing, you provide a scalable way to handle user interactions and background tasks, ensuring that the system remains responsive and reliable.
 
@@ -95,7 +95,7 @@ Implementing idempotent operations allows for retries without side effects, whic
 
 ### Use a remote vector index
 
-Choosing a remote vector index like [pgvector](https://github.com/pgvector/pgvector) or [AstraDB](https://www.datastax.com/products/datastax-astra) is critical for supporting the durable, high-throughput read/write operations necessary for RAG applications. These technologies are designed to handle the demands of vector indexing, offering the scalability and performance needed for fast retrieval of information. 
+Choosing a remote vector index like [pgvector](https://github.com/pgvector/pgvector) or [AstraDB](https://www.datastax.com/products/datastax-astra) is critical for supporting the durable, high-throughput read/write operations necessary for RAG applications. These technologies are designed to handle the demands of vector indexing, offering the scalability and performance needed for fast retrieval of information.
 
 A remote vector index also enables separation of concerns, allowing the computational workload associated with vector operations to be offloaded from the primary application database. This separation ensures that the indexing and retrieval processes do not interfere with each other, maintaining high availability and performance even under heavy load. Moreover, these solutions come with built-in durability and fault tolerance features, ensuring that your vector data remains intact and accessible even in the event of system failures.
 
@@ -109,7 +109,7 @@ Monitoring, auditing, and debugging take on heightened importance, not just for 
 
 ### Persist DB and LLM queries
 
-To effectively monitor and audit RAG applications, it is crucial to persist database (DB) and Large Language Model (LLM) queries. This involves capturing and storing logs of all interactions with the database and the language model, such as Postgres access logs and proprietary tools like [LangSmith](https://docs.smith.langchain.com/). The general principle is to ensure that every query, its response, and associated metadata are recorded. 
+To effectively monitor and audit RAG applications, it is crucial to persist database (DB) and Large Language Model (LLM) queries. This involves capturing and storing logs of all interactions with the database and the language model, such as Postgres access logs and proprietary tools like [LangSmith](https://docs.smith.langchain.com/). The general principle is to ensure that every query, its response, and associated metadata are recorded.
 
 This logging allows you to analyze the performance of both DB queries and LLM interactions over time, identify patterns or anomalies, and troubleshoot issues with data retrieval or language model responses. Additionally, by persisting these queries, organizations can track and forecast usage costs, crucial for managing expenses related to LLM usage.
 
@@ -121,7 +121,7 @@ This feedback not only serves as a critical metric for monitoring user satisfact
 
 ### Implement LLM performance testing
 
-To ensure the reliability and accuracy of RAG applications over time, implementing a robust regression testing framework is key. Tools like [TruLens](https://www.trulens.org/) or [RAGAS](https://docs.ragas.io/en/stable/), can be employed to systematically test the application against a suite of predefined scenarios and inputs. This testing helps identify any deviations from expected outcomes, potentially highlighting issues introduced by updates to the language model, changes in the data, or alterations in the application code. 
+To ensure the reliability and accuracy of RAG applications over time, implementing a robust regression testing framework is key. Tools like [TruLens](https://www.trulens.org/) or [RAGAS](https://docs.ragas.io/en/stable/), can be employed to systematically test the application against a suite of predefined scenarios and inputs. This testing helps identify any deviations from expected outcomes, potentially highlighting issues introduced by updates to the language model, changes in the data, or alterations in the application code.
 
 Regression testing is particularly important in the context of RAG applications due to the non-deterministic nature of language models; it ensures that updates or changes do not adversely affect the application's performance or the quality of its outputs. Furthermore, consistent regression testing facilitates a continuous improvement cycle, where feedback and testing results inform ongoing development and optimization efforts.
 
@@ -130,9 +130,9 @@ Regression testing is particularly important in the context of RAG applications 
 Transitioning RAG applications from prototyping to production can be challenging, but with careful planning and the right tools, these hurdles can be overcome. By addressing document management complexities, ensuring data persistence, and implementing robust monitoring and debugging practices, you can deploy RAG applications that are not only powerful but also reliable and maintainable. Remember, the key to success in production is not just leveraging the latest technology but also understanding the nuances of your application and anticipating potential challenges before they arise.
 
 :::info
-We developed Dewy to incorporate many of these lessons and ensure that you can focus on creating impactful applications without getting bogged down by the underlying complexities. 
+We developed Dewy to incorporate many of these lessons and ensure that you can focus on creating impactful applications without getting bogged down by the underlying complexities.
 
-Dewy is designed to handle document management, data persistence, and operational transparency, allowing you to leverage the power of RAG applications seamlessly. 
+Dewy is designed to handle document management, data persistence, and operational transparency, allowing you to leverage the power of RAG applications seamlessly.
 
-Check out [the docs](https://dewykb.github.io/docs/intro) to learn more!
+Check out [the docs](../docs/intro) to learn more!
 :::

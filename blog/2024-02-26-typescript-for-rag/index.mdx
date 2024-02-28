@@ -1,7 +1,7 @@
 ---
 slug: typescript-for-rag
 title: Typescript is a perfect fit for your RAG app
-description: Why TypeScript/JavaScript excels in RAG app development, offering rich prompt engineering, seamless API integration, and dynamic UIs for modern web apps.  
+description: Why TypeScript/JavaScript excels in RAG app development, offering rich prompt engineering, seamless API integration, and dynamic UIs for modern web apps.
 image: ./banner.png
 keywords:
   - NextJS RAG
@@ -32,7 +32,7 @@ authors:
 
 When it comes to building applications using Retrieval-Augmented Generation (RAG) many full-stack developers assume they need to start by learning Python and its extensive ML and GenAI ecosystem. But, Typescript (or Javascript if that’s your thing) is a perfect fit for this type of application.
 
-In this post we’ll look at the defining challenges of writing a RAG application and see how Typescript’s strengths are perfectly aligned with this problem. 
+In this post we’ll look at the defining challenges of writing a RAG application and see how Typescript’s strengths are perfectly aligned with this problem.
 
 
 # First of all, you don’t need Python
@@ -46,7 +46,7 @@ Many of the most popular Gen AI libraries (ie [LangChain](https://js.langchain.c
 
 # Prompt Engineering is where you’ll spend your time
 
-At the heart of any retrieval-augmented generation (RAG) application lies the art and science of prompt engineering—a  process that involves designing and refining the inputs (prompts) given to large language models (LLMs) to make the most accurate, relevant, and contextually appropriate responses. 
+At the heart of any retrieval-augmented generation (RAG) application lies the art and science of prompt engineering—a  process that involves designing and refining the inputs (prompts) given to large language models (LLMs) to make the most accurate, relevant, and contextually appropriate responses.
 
 ```typescript
 const prompt =
@@ -82,7 +82,7 @@ At the heart of RAG apps lies the ability to fetch, process, and synthesize info
 
 ```typescript
 const messages =  [
-    ...prompt, 
+    ...prompt,
     [{role: 'user': content: 'Tell me about RAG'}]
 ]
 const res = await openai.chat.completions.create({
@@ -96,7 +96,7 @@ TypeScript excels at orchestrating API calls and handling responses, seamlessly 
 
 # User experience is king
 
-User experience can make or break a RAG application, where the dynamic and often unpredictable nature of generated content presents unique challenges for user interface (UI) and user experience (UX) design. The stochasticity (unpredictability) inherent in the responses of generative models requires interfaces that can gracefully handle and present varying outputs in a coherent and user-friendly manner. 
+User experience can make or break a RAG application, where the dynamic and often unpredictable nature of generated content presents unique challenges for user interface (UI) and user experience (UX) design. The stochasticity (unpredictability) inherent in the responses of generative models requires interfaces that can gracefully handle and present varying outputs in a coherent and user-friendly manner.
 
 ![ChatGPT's feedback mechanisms](feedback.png)
 
@@ -110,12 +110,12 @@ TypeScript, with its roots deeply embedded in web technologies, is unparalleled 
 Document ingestion and indexing is an area where Python's mature Gen AI ecosystem has set it apart from Typescript. Until recently, the most commonly used libraries for preparing documents for RAG have been Python-based, and managing this process has been challenging:
 
 * Libraries like LangChain give you a hundred ways to do the same thing and no guidance on which is best
-* Orchestrating document processing and vector indexing in a robust, fault tolerant way is challenging ([more on this](https://dewykb.github.io/blog/rag-for-real))
+* Orchestrating document processing and vector indexing in a robust, fault tolerant way is challenging ([more on this](../blog/rag-for-real))
 * Querying and ranking extracted information is complex and it can be difficult to understand why your results aren’t relevant to the context
 
-These challenges are why we created [Dewy](https://github.com/DewyKB/dewy). 
+These challenges are why we created [Dewy](https://github.com/DewyKB/dewy).
 
-```typescript    
+```typescript
 const document = await dewy.kb.addDocument({
     collection: 'receipts',
     url: document_url,
@@ -127,6 +127,6 @@ Dewy is a standalone knowledge base that simplifies the complex process of extra
 
 # Conclusion
 
-The development landscape for RAG applications is evolving, with TypeScript leading the charge in accessibility, functionality, and efficiency. This ecosystem not only provides a comprehensive suite of tools for interacting with advanced AI models but also excels in the critical areas of API integration, user interface development, and data processing. 
+The development landscape for RAG applications is evolving, with TypeScript leading the charge in accessibility, functionality, and efficiency. This ecosystem not only provides a comprehensive suite of tools for interacting with advanced AI models but also excels in the critical areas of API integration, user interface development, and data processing.
 
 If you're embarking on the journey of creating a RAG application, TypeScript offers a compelling, versatile, and powerful toolkit that aligns perfectly with the demands of modern app development.

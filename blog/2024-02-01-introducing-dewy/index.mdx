@@ -12,8 +12,8 @@ import TabItem from '@theme/TabItem';
 
 
 
-Today we're releasing the first version of [Dewy](https://dewykb.github.io/dewy), a knowledge base built for the specific needs of Gen AI applications.
-Dewy makes it easy to find the right information to reduce LLM hallucinations by automating the extraction, indexing, and retrieval of your documents. 
+Today we're releasing the first version of [Dewy](..), a knowledge base built for the specific needs of Gen AI applications.
+Dewy makes it easy to find the right information to reduce LLM hallucinations by automating the extraction, indexing, and retrieval of your documents.
 We believe that Dewy's document-centric design is the best way to organize the knowledge needed for the majority of killer Gen AI apps.
 
 ## Why extracting the right information is so important
@@ -34,9 +34,9 @@ Each chunk captures some of the document's information and is used to provide co
 
 ## A modern document store
 
-Dewy doesn't _just_ extract chunks from documents, it also stores and organizes them - we think of Dewy as a document store for the Gen AI era. 
+Dewy doesn't _just_ extract chunks from documents, it also stores and organizes them - we think of Dewy as a document store for the Gen AI era.
 
-Production applications often need the ability to control which documents are used in a given query. 
+Production applications often need the ability to control which documents are used in a given query.
 f you don't want your LLM to leak sensitive information between users you can filter your results to chunks the user is allowed to use.
 Similarly, your application may need multiple independent knowledge stores to serve different workflows or use cases.
 Finally, you may need to manage documents that change over time - this can be challenging with low-level tools like vector databases because a single document may correspond to a large number of extracted rows.
@@ -72,16 +72,16 @@ Finally, you may need to manage documents that change over time - this can be ch
   </TabItem>
 </Tabs>
 
-__Data management in Dewy is document-centric.__ 
-Working at the level of documents (ie, as opposed to vectors) means Dewy operates at a higher level of abstraction than vector databases, and can more conveniently provide features such as access control, hybrid search, tagging, and other document organization techniques. 
+__Data management in Dewy is document-centric.__
+Working at the level of documents (ie, as opposed to vectors) means Dewy operates at a higher level of abstraction than vector databases, and can more conveniently provide features such as access control, hybrid search, tagging, and other document organization techniques.
 Best of all, there are no ingestion pipelines or job queues for you to build and manage - Dewy takes care of transforming your documents into relevant, usable search results.
 
 ## The best query language is your language
 
 It used to be that you would get data out of a database with a query language but today (to riff on [Andrej Karpathy](https://twitter.com/karpathy/status/1617979122625712128?lang=en)) the hottest query language is English, and Dewy embraces this mindset.
 
-Generative AI lets you build open-ended applications where it's hard to know beforehand what information will be relevant to a user at any given point in time, making it practically impossible to query data using hand-coded queries (ie, SQL). 
-Complicating things further, LLM-based applications often deal with subjective topics where the relevance of the information you've stored is ambiguous. 
+Generative AI lets you build open-ended applications where it's hard to know beforehand what information will be relevant to a user at any given point in time, making it practically impossible to query data using hand-coded queries (ie, SQL).
+Complicating things further, LLM-based applications often deal with subjective topics where the relevance of the information you've stored is ambiguous.
 
 <Tabs groupId="language">
 <TabItem value="typescript" default>
@@ -89,7 +89,7 @@ Complicating things further, LLM-based applications often deal with subjective t
 // Get chunks relevant to a user's question
 const context = await dewy.kb.retrieveChunks({
   collection: "main",
-  query: 'Tell me about RAG', 
+  query: 'Tell me about RAG',
   n: 10,
 });
 ```
@@ -110,9 +110,9 @@ retrieved = await retrieve_chunks.asyncio(RetrieveRequest(
 </TabItem>
 </Tabs>
 
-__Dewy brings together several state-of-the-art technologies to find the most relevant chunks for a given query.__ 
+__Dewy brings together several state-of-the-art technologies to find the most relevant chunks for a given query.__
 Chunks are prepared for extraction and embedded as high-dimensional vectors using modern embedding models.
-The resulting vectors capture the meaning / semantics of each chunk, and are stored in a vector index optimized for efficient and scalable searches. 
+The resulting vectors capture the meaning / semantics of each chunk, and are stored in a vector index optimized for efficient and scalable searches.
 When you make a query, Dewy transforms your query in the same way and looks for a set of chunk vectors that are similar to your query vector.
 Finally, Dewy may re-rank the chunks it finds or pull in additional, related chunks - this allows Dewy to take advantage of the structure and inter-relations it discovered while loading your documents.
 

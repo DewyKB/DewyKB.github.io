@@ -1,9 +1,9 @@
 ---
 slug: rag-app-with-nextjs-openai-and-dewy
-title: Building a RAG chatbot with NextJS, OpenAI & Dewy 
-description: This guide will walk you through building a RAG application using NextJS for the web framework, the OpenAI API for the language model, and Dewy as your knowledge base.  
+title: Building a RAG chatbot with NextJS, OpenAI & Dewy
+description: This guide will walk you through building a RAG application using NextJS for the web framework, the OpenAI API for the language model, and Dewy as your knowledge base.
 image: ./banner.png
-keywords: 
+keywords:
   - Retrieval-Augmented Generation Application
   - RAG Application Development
   - NextJS and OpenAI API Integration
@@ -30,9 +30,9 @@ authors:
 
 ![NextJS + OpenAI + Dewy](./banner.svg)
 
-Creating a Retrieval-Augmented Generation (RAG) application allows you to leverage the capabilities of language models while grounding their responses in specific, reliable information you provide to the model. 
+Creating a Retrieval-Augmented Generation (RAG) application allows you to leverage the capabilities of language models while grounding their responses in specific, reliable information you provide to the model.
 
-This guide will walk you through building a RAG application using [NextJS](https://nextjs.org/) for the web framework, the [OpenAI API](https://platform.openai.com/) for the language model, and [Dewy](https://dewykb.github.io/) as your knowledge base. 
+This guide will walk you through building a RAG application using [NextJS](https://nextjs.org/) for the web framework, the [OpenAI API](https://platform.openai.com/) for the language model, and [Dewy](..) as your knowledge base.
 
 By the end of this tutorial, you'll understand how to integrate these technologies to reduce hallucinations in language model responses and ensure the information provided is relevant and accurate.
 
@@ -45,12 +45,12 @@ Providing recent, relevant domain knowledge in the form of documents ensures the
 Using large documents (ie PDF's) for Retrieval-Augmented Generation (RAG) poses several challenges:
 * **Token limits** imposed by language models restrict the amount of text that can be analyzed in a single query, requiring documents to be summarized or "chunked" into smaller pieces
 * Automatically **extracting information** from documents designed for humans requires complex parsing and post-processing
-* **Documents may change** over time, making it difficult to maintain the accuracy and relevancy of the RAG system's outputs. 
+* **Documents may change** over time, making it difficult to maintain the accuracy and relevancy of the RAG system's outputs.
 * Finding the portions of a document that are most relevant to a given conversation requires sophisticated **semantic search** techniques.
 
 Passing the entire content of all the documents through the LLM for every question isn’t practical. Dewy (and RAG in general) addresses these by doing some work upfront – extracting and indexing the content – so that it can do less at query time.
 
-Dewy addresses these challenges by automating the extraction, indexing, and retrieval of information from your documents. 
+Dewy addresses these challenges by automating the extraction, indexing, and retrieval of information from your documents.
 
 ## Getting Started
 
@@ -60,7 +60,7 @@ The final code is available [as an example](https://github.com/DewyKB/dewy-ts/tr
 ### Prerequisites
 - Basic knowledge of JavaScript and React.
 - A NextJS environment set up on your local machine.
-- A copy of Dewy running on your local machine (see Dewy's [installation instructions](https://dewykb.github.io/docs/Getting%20Started/installation) if you need help here).
+- A copy of Dewy running on your local machine (see Dewy's [installation instructions](../docs/GettingStarted/installation) if you need help here).
 - Access to the OpenAI API platforms.
 
 ### Step 1: Set Up Your NextJS Project
@@ -73,7 +73,7 @@ The final code is available [as an example](https://github.com/DewyKB/dewy-ts/tr
    cd my-rag-app
    ```
 
-1. **Install required packages:** Install client libraries for the OpenAI API and Dewy. 
+1. **Install required packages:** Install client libraries for the OpenAI API and Dewy.
 
     ```
     npm install openai dewy-ts ai
@@ -120,7 +120,7 @@ Dewy takes care of downloading the document, extracting information from it and 
 1. **Create a generation function**: This function will take the user's query and the retrieved documents from Dewy, and send a request to the OpenAI API to generate a response. The key is to format the prompt to include relevant information from the retrieved documents.
     ```tsx title="app/api/chat/utils.tsx"
     import OpenAI from 'openai';
-    import { Dewy } from 'dewy-ts'; 
+    import { Dewy } from 'dewy-ts';
 
     // Create Dewy and OpenAI clients
     const openai = new OpenAI({
@@ -134,7 +134,7 @@ Dewy takes care of downloading the document, extracting information from it and 
         // Search Dewy for chunks relevant to the given query.
         const context = await dewy.kb.retrieveChunks({
             collection: process.env.DEWY_COLLECTION,
-            query: query, 
+            query: query,
             n: 10,
         });
 
@@ -142,7 +142,7 @@ Dewy takes care of downloading the document, extracting information from it and 
         const prompt = [{
             role: 'system',
             content: `You are a helpful assistant.
-                You will take into account any CONTEXT BLOCK 
+                You will take into account any CONTEXT BLOCK
                 that is provided in a conversation.
                 START CONTEXT BLOCK
                 ${context.results.map((c: any) => c.chunk.text).join("\n")}
@@ -191,14 +191,14 @@ Dewy takes care of downloading the document, extracting information from it and 
     export default function AddFromUrl(props) {
         async function onSubmit(event: FormEvent<HTMLFormElement>) {
             event.preventDefault()
-        
+
             const formData = new FormData(event.currentTarget)
             await fetch('/api/documents', {
                 method: 'POST',
                 body: formData,
             })
         }
-        
+
         return (
             <form onSubmit={onSubmit} {...props}>
                 <input type="text" name="url" placeholder="URL to load..."/>
@@ -210,10 +210,10 @@ Dewy takes care of downloading the document, extracting information from it and 
 1. **Create a simple chat UI**: Use NextJS pages to build a user interface where users can input their queries. This will involve creating a form in the `pages/index.js` file.
    ```tsx title="app/page.tsx"
     'use client';
-    
+
     import { useChat } from 'ai/react';
     import AddFromUrl from './components/AddFromUrl';
-    
+
     export default function Chat() {
         const { messages, input, handleInputChange, handleSubmit } = useChat();
         return (
@@ -224,7 +224,7 @@ Dewy takes care of downloading the document, extracting information from it and 
                 {m.content}
                 </div>
             ))}
-        
+
             <form onSubmit={handleSubmit}>
                 <input
                 className="fixed bottom-10 w-full max-w-md p-2 mb-8 border border-gray-300 rounded "
@@ -256,24 +256,24 @@ You should see a simple chat UI like the following:
 In addition to API endpoints for managing documents programmatically, Dewy provides a GUI admin console.
 You can see the admin console in a browser at port 8000 (ie `https://localhost:8000` if you're running Dewy locally).
 
-Dewy's admin console is designed to streamline the management of documents used for Retrieval-Augmented Generation (RAG) applications. 
-By offering an intuitive interface and comprehensive features, it helps you fine-tune your knowledge bases, ensuring the AI generates responses that are both accurate and relevant. 
+Dewy's admin console is designed to streamline the management of documents used for Retrieval-Augmented Generation (RAG) applications.
+By offering an intuitive interface and comprehensive features, it helps you fine-tune your knowledge bases, ensuring the AI generates responses that are both accurate and relevant.
 Here's how you can use Dewy's admin console to manage your documents effectively:
 
 ### Adding a Document
 
 ![See the documents in Dewy](./documents.png)
 
-Upload or input new documents into your Dewy knowledge base through the admin console. 
+Upload or input new documents into your Dewy knowledge base through the admin console.
 
-Once a document is added, you can immediately observe how it influences the AI-generated results. 
+Once a document is added, you can immediately observe how it influences the AI-generated results.
 This is useful for assessing the utility of new information and ensuring it aligns with the desired output quality and relevance.
 
 ### Exploring Extracted Information
 
 ![Explore individual documents and extracted chunks](./document.png)
 
-Dewy's console allows you to get into the specifics of how information is extracted from each document. 
+Dewy's console allows you to get into the specifics of how information is extracted from each document.
 You can view structured data extracted from the text, making it easier to understand how the document might influence generation.
 
 This exploration aids in fine-tuning the extraction process, ensuring that the most relevant pieces of information are highlighted and utilized in the RAG process.
@@ -282,7 +282,7 @@ This exploration aids in fine-tuning the extraction process, ensuring that the m
 
 ![Search for relevant chunks](./search.png)
 
-The admin console lets you test sample queries against your knowledge base. 
+The admin console lets you test sample queries against your knowledge base.
 This helps when evaluating how well the RAG system retrieves relevant document chunks based on different inputs.
 
 By observing what is returned for each sample query, you can quickly gauge the effectiveness of your current document set and retrieval algorithms, making it easier to identify areas for improvement.
