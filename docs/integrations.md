@@ -37,3 +37,4 @@ See [Building a question-answering CLI with LangChain.js and Dewy](../blog/qa-cl
 ### LangChain
 
 [`dewy-langchain`](https://pypi.org/project/dewy-langchain/) provides a LangChain retriever backed by the Dewy API.
+See [Building a question-answering CLI with LangChain and Dewy](../blog/langchain-python-cli/).
