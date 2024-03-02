@@ -147,8 +147,25 @@ const config: Config = {
           },
         }
       },
+    ],
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        fromExtensions: ['html', 'htm'], // /myPage.html -> /myPage
+        redirects: [
+          // Redirect old pages (Getting Started) and (User Manual) to new pages
+          // (GettingStarted) and (UserManual). We don't nede to redirect all pages
+          // in these categories, only the ones that may have been linked by blog
+          // posts written before we removed the space.
+          { to: "/docs/GettingStarted/admin_ui", from: "/docs/Getting Started/admin_ui"},
+          { to: "/docs/GettingStarted/clients", from: "/docs/Getting Started/clients"},
+          { to: "/docs/GettingStarted/configuration", from: "/docs/Getting Started/configuration"},
+          { to: "/docs/GettingStarted/installation", from: "/docs/Getting Started/installation"},
+          { to: "/docs/UserManual/concepts", from: "/docs/User Manual/concepts"},
+        ],
+      },
     ]
-  ]
+  ],
 };
 
 export default config;
