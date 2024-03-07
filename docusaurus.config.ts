@@ -71,7 +71,7 @@ const config: Config = {
     navbar: {
       title: 'Dewy',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Dewy Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -81,6 +81,7 @@ const config: Config = {
           position: 'left',
           label: 'Documentation',
         },
+        {to: '/community', label: 'Community', position: 'left'},
         {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/DewyKB/dewy',
