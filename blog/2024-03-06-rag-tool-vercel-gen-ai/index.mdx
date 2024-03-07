@@ -2,7 +2,7 @@
 slug: rag-tool-vercel-gen-ai
 title: Building a RAG "tool" with Dewy and Vercel's Generative UI components
 description: A tutorial showing how to implement retrieval as an LLM-invoked tool with Vercel's Generative UI components library.
-image: banner.png
+image: rag-tool.png
 keywords:
   - RAG tool development
   - Vercel Generative UI library
@@ -28,52 +28,13 @@ Retrieval-Augmented Generation (RAG) blends the generative abilities of LLMs wit
 However, traditional implementations of RAG have often relied on pre-scripting the logic for selecting and utilizing these KBs. 
 This conventional method, while effective, places limits on the flexibility and adaptability, and performance of the applications.
 
-```mermaid
-sequenceDiagram title Traditional RAG
-    actor User
-    participant Service
-    participant LLM
-    participant KB
-
-    User->>+Service: What is the meaning of life
-    Service->>+KB: What is the meaning of life
-    Note over KB: Naive Knowledge Retrieval
-    KB-->>-Service: [42, Coffee]
-
-    Service->>+LLM: What is the meaning of life (context: [42, Coffee])
-    Note over LLM: Augmented Generation
-    LLM-->>-Service: 42
-
-    Service-->>-User: 42
-```
+![Naive RAG](naive-rag.png)
 
 But consider an alternative: applications that empower the LLM itself to determine which actions are necessary to generate a response. 
 This approach not only harnesses the LLM's generative capabilities but also its ability to make contextual decisions on-the-fly, thereby opening up a more dynamic and responsive way to handle knowledge search tasks.
 As a result, you can build targeted KB's and use the power of LLMs to write application-specific queries that retrieve better, more relevant results.
 
-```mermaid
-sequenceDiagram title RAG Tool
-    actor User
-    participant Service
-    participant LLM
-    participant KB
-
-    User->>+Service: What is the meaning of life
-
-    Service->>+LLM: What is the meaning of life
-    Note over LLM: LLM Selects Tools
-    LLM-->-Service: search_kb('meaning of life')
-
-    Service->>+KB: meaning of life
-    Note over KB: LLM-Directed Retrieval
-    KB-->-Service: [42, Coffee]
-
-    Service->>+LLM: What is the meaning of life (context: [42, Coffee])
-    Note over LLM: Augmented Generation
-    LLM-->>-Service: 42
-
-    Service-->>-User: 42
-```
+![RAG Tool](rag-tool.png)
 
 To demonstrate this approach, we'll build [a simple chatbot](https://github.com/DewyKB/dewy-ts/tree/main/examples) backed by a custom tool.
 The chatbot will have access to a KB containing product information - any time you ask a question the chatbot determines could be answered using this tool it will query the KB and show both the in-progress query and retrieved results as custom UI elements before responding with the retrieved products as context.
