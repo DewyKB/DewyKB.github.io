@@ -1,0 +1,197 @@
+---
+sidebar_position: 2
+--- 
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Loading Documents
+
+## Document Types
+
+Dewy supports loading a variety of different document types.
+The document type is inferred at load time as follows:
+
+1. The file's MIME type.
+1. File extension (ie `.md` or `.pdf`)
+
+The following document types are supported:
+
+* PDF
+* Markdown
+* HTML
+* DocX
+
+
+
+## Loading from a file
+
+Loading a document from a file is a two step process:
+
+1. Create the document using `addDocument`
+2. Upload the file's content to Dewy using `uploadDocumentContent`
+
+<Tabs groupId="language">
+    <TabItem value="typescript">
+    ```typescript
+    import { Dewy } from 'dewy-ts';
+    const dewy = new Dewy()
+
+    const document = await dewy.kb.addDocument({ collection: "main" })
+
+    const formData = new FormData()
+    formData.append("content": blob) // blob via openBlob, request, etc
+
+    await dewy.kb.uploadDocumentContent(document.id, formData)
+
+    ```
+    </TabItem>
+    <TabItem value="python">
+    ```python
+    from dewy_client.api.kb import add_document
+    from dewy_client.models import AddDocumentRequest
+    from dewy_client import Client
+
+    client = Client()
+
+    document = await add_document.asyncio(
+      client=client,
+      body=AddDocumentRequest(collection="main"),
+    )
+
+    with open("example.pdf", "rb") as file:
+      payload = file.read()
+      
+      upload_document_content.sync(
+          document.id,
+          client=client,
+          body=BodyUploadDocumentContent(
+              content=File(
+                  payload=payload,
+                  file_name=os.path.basename("example.pdf"),
+              ),
+          ),
+      )
+    ```
+    </TabItem>
+    <TabItem value="python (sync)">
+    ```python
+    from dewy_client.api.kb import add_document
+    from dewy_client.models import AddDocumentRequest
+    from dewy_client import Client
+
+    client = Client()
+
+    document = add_document.sync(
+      client=client,
+      body=AddDocumentRequest(collection="main"),
+    )
+
+    with open("example.pdf", "rb") as file:
+      payload = file.read()
+      
+      upload_document_content.sync(
+          document.id,
+          client=client,
+          body=BodyUploadDocumentContent(
+              content=File(
+                  payload=payload,
+                  file_name=os.path.basename("example.pdf"),
+              ),
+          ),
+      )
+    ```
+    </TabItem>
+</Tabs>
+
+Document contents are extracted asynchronously after the `uploadDocumentContent` operation returns.
+To see the result of loading content into a document, use `getDocumentStatus`. 
+When the document has been loaded its `ingest_state` will be `ingested`. 
+If errors are encountered during loading, `ingest_state` will be `failed` and `ingest_error` will contain a description of the failure.
+
+<Tabs groupId="language">
+    <TabItem value="typescript">
+    ```typescript
+    const status = await dewy.kb.getDocumentStatus(document.id)
+
+    console.log(status.ingest_state)
+    ```
+    </TabItem>
+    <TabItem value="python">
+    ```python
+    from dewy_client.api.kb import get_document_status
+
+    status = await get_document_status.asyncio(
+      document.id,
+      client=client,
+    )
+    print(status.ingest_state)
+    ```
+    </TabItem>
+    <TabItem value="python (sync)">
+    ```python
+    from dewy_client.api.kb import get_document_status
+
+    status = get_document_status.sync(
+      document.id,
+      client=client,
+    )
+    print(status.ingest_state)
+    ```
+    </TabItem>
+</Tabs>
+
+## Loading from a URL
+
+Documents can be loaded from a URL.
+The URL must be accessible to Dewy - Dewy will attempt to download the file to its local disk before extracting content from the file.
+Once the URL has been downloaded, the document is loaded in the same way as when loading from a file.
+When you load documents from a URL, there's no need to call `uploadDocumentContent`.
+
+<Tabs groupId="language">
+    <TabItem value="typescript">
+    ```typescript
+    import { Dewy } from 'dewy-ts';
+    const dewy = new Dewy()
+
+    const document = await dewy.kb.addDocument({
+      collection: "main",
+      url: 'https://arxiv.org/abs/2005.11401',
+    })
+    ```
+    </TabItem>
+    <TabItem value="python">
+    ```python
+    from dewy_client.api.kb import add_document
+    from dewy_client.models import AddDocumentRequest
+    from dewy_client import Client
+
+    client = Client()
+
+    document = await add_document.asyncio(
+      client=client,
+      body=AddDocumentRequest(
+        collection="main", 
+        url="https://arxiv.org/abs/2005.11401",
+      ),
+    )
+    ```
+    </TabItem>
+    <TabItem value="python (sync)">
+    ```python
+    from dewy_client.api.kb import add_document
+    from dewy_client.models import AddDocumentRequest
+    from dewy_client import Client
+
+    client = Client()
+
+    document = add_document.sync(
+      client=client,
+      body=AddDocumentRequest(
+        collection="main", 
+        url="https://arxiv.org/abs/2005.11401",
+      ),
+    )
+    ```
+    </TabItem>
+</Tabs>
