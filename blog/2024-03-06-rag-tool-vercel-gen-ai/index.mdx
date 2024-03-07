@@ -24,7 +24,7 @@ authors:
 ---
 # Building a RAG tool with Vercel's Generative UI components
 
-Retrieval-Augmented Generation (RAG) techniques blend the generative capabilities of LLMs with the retrieval of information from diverse knowledge bases (KBs). 
+Retrieval-Augmented Generation (RAG) blends the generative abilities of LLMs with the retrieval of information from diverse knowledge bases (KBs). 
 However, traditional implementations of RAG have often relied on pre-scripting the logic for selecting and utilizing these KBs. 
 This conventional method, while effective, places limits on the flexibility and adaptability, and performance of the applications.
 
@@ -37,12 +37,12 @@ sequenceDiagram title Traditional RAG
 
     User->>+Service: What is the meaning of life
     Service->>+KB: What is the meaning of life
+    Note over KB: Naive Knowledge Retrieval
     KB-->>-Service: [42, Coffee]
-    Note over Service,KB: Naive Knowledge Retrieval
 
     Service->>+LLM: What is the meaning of life (context: [42, Coffee])
+    Note over LLM: Augmented Generation
     LLM-->>-Service: 42
-    Note over Service,LLM: Augmented Generation
 
     Service-->>-User: 42
 ```
@@ -61,35 +61,34 @@ sequenceDiagram title RAG Tool
     User->>+Service: What is the meaning of life
 
     Service->>+LLM: What is the meaning of life
+    Note over LLM: LLM Selects Tools
     LLM-->-Service: search_kb('meaning of life')
-    Note over Service,LLM: LLM Selects Tools
 
     Service->>+KB: meaning of life
+    Note over KB: LLM-Directed Retrieval
     KB-->-Service: [42, Coffee]
-    Note over Service,KB: LLM-Directed Retrieval
 
     Service->>+LLM: What is the meaning of life (context: [42, Coffee])
+    Note over LLM: Augmented Generation
     LLM-->>-Service: 42
-    Note over Service,LLM: Augmented Generation
 
     Service-->>-User: 42
 ```
-
 
 To demonstrate this approach, we'll build [a simple chatbot](https://github.com/DewyKB/dewy-ts/tree/main/examples) backed by a custom tool.
 The chatbot will have access to a KB containing product information - any time you ask a question the chatbot determines could be answered using this tool it will query the KB and show both the in-progress query and retrieved results as custom UI elements before responding with the retrieved products as context.
 
 ![Screen capture of finished app](screencap.gif)
 
-We'll use Vercel's Generative UI library to render the chat window and Dewy to implement the information storage and retrieval used by our tool. 
+We'll use Vercel's [Generative UI library](https://sdk.vercel.ai/docs/concepts/ai-rsc) to render the chat window and Dewy to implement the information storage and retrieval used by our tool and [Dewy](https://github.com/DewyKB/dewy) as the knowledge store backing the tool. 
 
 ## Why Dewy and Vercel?
 
-**Vercel's [Generative UI library](https://sdk.vercel.ai/docs/concepts/ai-rsc)** is designed to simplify the creation of custom LLM "tools" and to render rich, interactive UI elements that are specific to each tool the LLM chooses to use. 
-What this means in practice is a seamless and engaging user experience, where the interface adapts and evolves based on the context of the query and the tools selected by the LLM. 
+**Vercel's Generative UI library)** is designed to simplify the creation of custom LLM "tools" and to render rich, interactive UI elements that are specific to each tool the LLM chooses to use. 
+What this means in practice is that your UI can dynamically adapt to the specific tools chosen by the LLM, displaying tool-specific information and progress indicators to the user.
 
-**[Dewy](https://github.com/DewyKB/dewy)** is an OSS knowledge base designed to streamline the way developers store, organize, and retrieve information. 
-Dewy is a knowledge base with the simplicity and ease-of-use of a document store:  insert your documents and Dewy takes care of preparing them for semantic searching. Dewy's flexibility and ease of use make it an excellent choice for developers aiming to build custom knowledge-driven LLM tools.
+**Dewy** is an OSS knowledge base with the simplicity and ease-of-use of a document store: insert your documents and Dewy takes care of preparing them for semantic search. 
+Dewy's flexibility and ease of use allow developers to focus on building amazing user experiences rather than complex data-processing pipelines.
 
 ## Prerequisites
 
@@ -97,7 +96,7 @@ Before diving into the tutorial, ensure you have the following prerequisites cov
 
 * Basic knowledge of Typescript and React
 * A NextJS environment setup on your local machine
-* A copy of Dewy running on your local machine (see Dewy's [installation instructions](http://localhost:3001/docs/Getting%20Started/installation) if you need help here).
+* A copy of Dewy running on your local machine (see Dewy's [installation instructions](/docs/GettingStarted/installation) if you need help here).
 * Access to the [OpenAI API](https://platform.openai.com/) platform.
 
 ## Set up your project
@@ -431,7 +430,7 @@ export default function Page() {
 }
 ```
 
-To keep this post from going any longer than it is already, several basic UI components have been omitted, but you can checkout the full implementation in the [examples directory](https://github.com/DewyKB/dewy-ts/tree/main/examples) of the Dewy repo.
+To keep this post from going any longer than it is already, several basic UI components have been omitted, but you can checkout the full implementation in the [examples directory](https://github.com/DewyKB/dewy-ts/tree/main/examples/rag-tool-vercel) of the Dewy repo.
 
 ## Conclusion
 

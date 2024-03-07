@@ -31,11 +31,6 @@ const config: Config = {
     locales: ['en'],
   },
 
-  markdown: {
-    mermaid: true,
-  },
-  themes: ['@docusaurus/theme-mermaid'],
-
   presets: [
     [
       'classic',
@@ -137,7 +132,14 @@ const config: Config = {
     },
   } satisfies Preset.ThemeConfig,
 
-  themes: ["docusaurus-theme-openapi-docs"], // export theme components
+
+  markdown: {
+    mermaid: true,
+  },
+  themes: [
+    'docusaurus-theme-openapi-docs',
+    '@docusaurus/theme-mermaid',
+  ], // export theme components
   plugins: [
     [
       'docusaurus-plugin-openapi-docs',
