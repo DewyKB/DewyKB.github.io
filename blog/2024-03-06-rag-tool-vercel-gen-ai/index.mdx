@@ -199,7 +199,7 @@ export default function productSearch(aiState, openai) {
             // Display the response alongside 
             // the products provided to the model.
             return <div className="flex flex-col gap-2">
-                <ResultCard query={query} results={context} />
+                <ResultCard query={query} results={products} />
                 <AssistantMessage>
                     <Tokens stream={stream} />
                 </AssistantMessage>
